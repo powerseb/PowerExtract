@@ -1,12 +1,8 @@
-﻿Function Invoke-PowerExtract
-{
-param(
-    $PathToDMP,
-    [boolean]$Debug=$false
-)
-
-<#
+﻿<#
 .SYNOPSIS
+Invoke-PowerExtract
+
+.DESCRIPTION
 Invoke-PowerExtract parses and extracts information (e.g. NT-hashes) from memory dumps of the LSASS process. 
 
 Author: Powerpointken 
@@ -27,9 +23,18 @@ Parse a memory dump with debug output
 Invoke-PowerExtract -PathToDMP C:\temp\lsass.dmp -Debug $true
 
 .LINK
-
+https://github.com/powerpointken
 
 #>
+
+Function Invoke-PowerExtract
+{
+param(
+    $PathToDMP,
+    [boolean]$Debug=$false
+)
+
+
 
 
 
