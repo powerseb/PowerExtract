@@ -1029,7 +1029,7 @@ $Start = Get-Date
         return $PatternData
         }
     
-    function Select-CryptoTemplate
+        function Select-CryptoTemplate
         {
         Param(
             [int]$OSVersion,
@@ -1056,9 +1056,11 @@ $Start = Get-Date
             "IV-Offset" = $null
             "DES-Offset" = $null
             "AES-Offset" = $null
+            "key-handle" = $null
+            "key-struct" = $null
             })
     
-        if($OSVersion -le $WIN_XP)
+        if(($OSVersion -le $WIN_XP) -or ($OSVersion -lt $WIN_2K3))
             {
                 Write-Debug -Message ("Identified OS Version is " + $OSVersion)
                 Write-Debug -Message ("Currently no crypto template for the detected OS Version present - Script will be terminated") 
@@ -1069,9 +1071,11 @@ $Start = Get-Date
                     "IV-Offset" = $null
                     "DES-Offset" = $null
                     "AES-Offset" = $null
+                    "key-handle" = $null
+                    "key-struct" = $null
                     })
             }
-        elseif($OSVersion -le $WIN_2K3)
+        elseif(($OSVersion -le $WIN_2K3) -or ($OSVersion -lt $WIN_VISTA))
             {
                 Write-Debug -Message ("Identified OS Version is " + $OSVersion)
                 Write-Debug -Message ("Currently no crypto template for the detected OS Version present - Script will be terminated") 
@@ -1082,9 +1086,11 @@ $Start = Get-Date
                     "IV-Offset" = $null
                     "DES-Offset" = $null
                     "AES-Offset" = $null
+                    "key-handle" = $null
+                    "key-struct" = $null
                     })
             }
-        elseif($OSVersion -le $WIN_VISTA)
+        elseif(($OSVersion -le $WIN_VISTA) -or ($OSVersion -lt $WIN_7))
             {
                 Write-Debug -Message ("Identified OS Version is " + $OSVersion)
                 Write-Debug -Message ("Currently no crypto template for the detected OS Version present - Script will be terminated") 
@@ -1095,43 +1101,52 @@ $Start = Get-Date
                     "IV-Offset" = $null
                     "DES-Offset" = $null
                     "AES-Offset" = $null
+                    "key-handle" = $null
+                    "key-struct" = $null
                     })
             }
-        elseif($OSVersion -le $WIN_7)
+        elseif(($OSVersion -le $WIN_7) -or ($OSVersion -lt $WIN_8))
             {
                 Write-Debug -Message ("Identified OS Version is " + $OSVersion)
                 Write-Debug -Message ("Crypto template identfied and selected")
                 $Crypto = New-Object -Type psobject -Property (@{
-                    "Pattern" = "8364243000448B4C2448488B0D"
-                    "IV-Offset" = 63
-                    "DES-Offset" = -69
-                    "AES-Offset" = 25
-                    })
-            }
-        elseif($OSVersion -le $WIN_8)
-            {
-                Write-Debug -Message ("Identified OS Version is " + $OSVersion)
-                Write-Debug -Message ("Crypto template identfied and selected")
-                $Crypto = New-Object -Type psobject -Property (@{
+                                 
                     "Pattern" = "8364243000448B4C2448488B0D"
                     "IV-Offset" = 59
                     "DES-Offset" = -61
                     "AES-Offset" = 25
+                    "key-handle" = "Get-BCRYPT_HANDLE_KEY"
+                    "key-struct" = "Get-BCRYPT_KEY"
                     })
             }
-        #Value need to be tested - if there is a version number before WIN10 but not Windows Blue
-        elseif($OSVersion -le $WIN_BLUE)
+        elseif(($OSVersion -le $WIN_8) -or ($OSVersion -lt $WIN_BLUE))
             {
                 Write-Debug -Message ("Identified OS Version is " + $OSVersion)
                 Write-Debug -Message ("Crypto template identfied and selected")
                 $Crypto = New-Object -Type psobject -Property (@{
-                    "Pattern" = "8364243000448B4C2448488B0D"
+                    "Pattern" = "8364243000448B4DD8488B0D"
                     "IV-Offset" = 62
                     "DES-Offset" = -70
                     "AES-Offset" = 23
+                    "key-handle" = "Get-BCRYPT_HANDLE_KEY"
+                    "key-struct" = "Get-BCRYPT_KEY8"
                     })
             }
-        elseif($OSVersion -le $WIN_10_1507)
+        #Value need to be tested - if there is a version number before WIN10 but not Windows Blue
+        elseif(($OSVersion -le $WIN_BLUE) -or ($OSVersion -lt $WIN_10_1507))
+            {
+                Write-Debug -Message ("Identified OS Version is " + $OSVersion)
+                Write-Debug -Message ("Crypto template identfied and selected")
+                $Crypto = New-Object -Type psobject -Property (@{
+                    "Pattern" = "8364243000448B4DD8488B0D"
+                    "IV-Offset" = 62
+                    "DES-Offset" = -70
+                    "AES-Offset" = 23
+                    "key-handle" = "Get-BCRYPT_HANDLE_KEY"
+                    "key-struct" = "Get-BCRYPT_KEY81"
+                    })
+            }
+        elseif(($OSVersion -le $WIN_10_1507) -or ($OSVersion -lt $WIN_10_1511))
             {
                 Write-Debug -Message ("Identified OS Version is " + $OSVersion)
                 Write-Debug -Message ("Crypto template identfied and selected")
@@ -1140,9 +1155,11 @@ $Start = Get-Date
                     "IV-Offset" = 61
                     "DES-Offset" = -73
                     "AES-Offset" = 16
+                    "key-handle" = "Get-BCRYPT_HANDLE_KEY"
+                    "key-struct" = "Get-BCRYPT_KEY81"
                     })
             }
-        elseif($OSVersion -le $WIN_10_1511)
+        elseif(($OSVersion -le $WIN_10_1511) -or ($OSVersion -lt $WIN_10_1607))
             {
                 Write-Debug -Message ("Identified OS Version is " + $OSVersion)
                 Write-Debug -Message ("Crypto template identfied and selected")
@@ -1151,9 +1168,11 @@ $Start = Get-Date
                     "IV-Offset" = 61
                     "DES-Offset" = -73
                     "AES-Offset" = 16
+                    "key-handle" = "Get-BCRYPT_HANDLE_KEY"
+                    "key-struct" = "Get-BCRYPT_KEY81"
                     })
             }
-        elseif($OSVersion -le $WIN_10_1607)
+        elseif(($OSVersion -le $WIN_10_1607) -or ($OSVersion -lt $WIN_10_1703))
             {
                 Write-Debug -Message ("Identified OS Version is " + $OSVersion)
                 Write-Debug -Message ("Crypto template identfied and selected")
@@ -1162,9 +1181,11 @@ $Start = Get-Date
                     "IV-Offset" = 61
                     "DES-Offset" = -73
                     "AES-Offset" = 16
+                    "key-handle" = "Get-BCRYPT_HANDLE_KEY"
+                    "key-struct" = "Get-BCRYPT_KEY81"
                     })
             }
-        elseif($OSVersion -lt $WIN_10_1703)
+        elseif(($OSVersion -lt $WIN_10_1703) -or ($OSVersion -lt $WIN_10_1709))
             {
                 Write-Debug -Message ("Identified OS Version is " + $OSVersion)
                 Write-Debug -Message ("Crypto template identfied and selected")
@@ -1173,9 +1194,11 @@ $Start = Get-Date
                     "IV-Offset" = 61
                     "DES-Offset" = -73
                     "AES-Offset" = 16
+                    "key-handle" = "Get-BCRYPT_HANDLE_KEY"
+                    "key-struct" = "Get-BCRYPT_KEY81"
                     })
             }
-        elseif($OSVersion -le $WIN_10_1709)
+        elseif(($OSVersion -le $WIN_10_1709) -or ($OSVersion -lt $WIN_10_1803))
             {
                 Write-Debug -Message ("Identified OS Version is " + $OSVersion)
                 Write-Debug -Message ("Crypto template identfied and selected")
@@ -1184,10 +1207,12 @@ $Start = Get-Date
                     "IV-Offset" = 61
                     "DES-Offset" = -73
                     "AES-Offset" = 16
+                    "key-handle" = "Get-BCRYPT_HANDLE_KEY"
+                    "key-struct" = "Get-BCRYPT_KEY81"
                     })
                     
             }
-        elseif($OSVersion -le $WIN_10_1803)
+        elseif(($OSVersion -le $WIN_10_1803) -or ($OSVersion -lt $WIN_10_1809))
             {
                 Write-Debug -Message ("Identified OS Version is " + $OSVersion)
                 Write-Debug -Message ("Crypto template identfied and selected")
@@ -1196,6 +1221,8 @@ $Start = Get-Date
                     "IV-Offset" = 61
                     "DES-Offset" = -73
                     "AES-Offset" = 16
+                    "key-handle" = "Get-BCRYPT_HANDLE_KEY"
+                    "key-struct" = "Get-BCRYPT_KEY81"
                     })
     
             }
@@ -1208,6 +1235,8 @@ $Start = Get-Date
                     "IV-Offset" = 61
                     "DES-Offset" = -73
                     "AES-Offset" = 16
+                    "key-handle" = "Get-BCRYPT_HANDLE_KEY"
+                    "key-struct" = "Get-BCRYPT_KEY81"
                     })
             }
         else
@@ -1219,6 +1248,8 @@ $Start = Get-Date
                     "IV-Offset" = 67
                     "DES-Offset" = -89
                     "AES-Offset" = 16
+                    "key-handle" = "Get-BCRYPT_HANDLE_KEY"
+                    "key-struct" = "Get-BCRYPT_KEY81"
                     })
     
             }
@@ -1253,42 +1284,55 @@ $Start = Get-Date
         $offset_to_SessionCounter = $null
     
     
-        if($OSVersion -le $WIN_XP)
+        if(($OSVersion -le $WIN_XP) -or ($OSVersion -lt $WIN_2K3))
             {
                 Write-Debug -Message ("Identified OS Version is " + $OSVersion)
                 Write-Debug -Message ("Currently no credential template for the detected OS Version present - Script will be terminated")
                 Start-Sleep -Seconds 3
                 Exit
             }
-        elseif($OSVersion -le $WIN_2K3)
+        elseif(($OSVersion -le $WIN_2K3) -or ($OSVersion -lt $WIN_VISTA))
             {
                 Write-Debug -Message ("Identified OS Version is " + $OSVersion)
                 Write-Debug -Message ("Currently no credential template for the detected OS Version present - Script will be terminated") 
                 Start-Sleep -Seconds 3
                 Exit  
             }
-        elseif($OSVersion -le $WIN_VISTA)
+        elseif(($OSVersion -le $WIN_VISTA) -or ($OSVersion -lt $WIN_7))
             {
                 Write-Debug -Message ("Identified OS Version is " + $OSVersion)
                 Write-Debug -Message ("Currently no credential template for the detected OS Version present - Script will be terminated")    
                 Start-Sleep -Seconds 3
                 Exit
             }
-        elseif($OSVersion -le $WIN_7)
+        elseif(($OSVersion -le $WIN_7) -or ($OSVersion -lt $WIN_8))
             {
                 Write-Debug -Message ("Identified OS Version is " + $OSVersion)
-                Write-Debug -Message ("Currently no credential template for the detected OS Version present - Script will be terminated")    
-                Start-Sleep -Seconds 3
-                Exit
+                Write-Debug -Message ("Credential template identfied and selected")
+                $Pattern = "33F645892F4C8BF385FF0F84"
+                $offset_to_FirstEntry = 19
+                $offset_to_SessionCounter = -4
+                $ParsingFunction = "Get-MSV1_0_LIST_61"
+                $CredParsingFunction = "Parse-PrimaryCredential"
             }
-        elseif($OSVersion -le $WIN_8)
+        elseif(($OSVersion -le $WIN_8) -or ($OSVersion -lt $WIN_BLUE))
             {
                 Write-Debug -Message ("Identified OS Version is " + $OSVersion)
-                Write-Debug -Message ("Currently no credential template for the detected OS Version present - Script will be terminated") 
-                Start-Sleep -Seconds 3
-                Exit   
+                Write-Debug -Message ("Credential template identfied and selected")
+                $Pattern = "33FF4189374C8BF34585C074"
+                $offset_to_FirstEntry = 16
+                $offset_to_SessionCounter = -4
+                if($LSATimestamp -gt "139722752")
+                    {
+                    $ParsingFunction = "Get-MSV1_0_LIST_63"
+                    }
+                else 
+                    {
+                    $ParsingFunction = "Get-MSV1_0_LIST_62"
+                    }
+                $CredParsingFunction = "Parse-PrimaryCredential" 
             }
-        elseif($OSVersion -le $WIN_BLUE)
+        elseif(($OSVersion -le $WIN_BLUE) -or ($OSVersion -lt $WIN_10_1507))
             {
                 Write-Debug -Message ("Identified OS Version is " + $OSVersion)
                 Write-Debug -Message ("Credential template identfied and selected")
@@ -1303,10 +1347,9 @@ $Start = Get-Date
                     {
                     $ParsingFunction = "Get-MSV1_0_LIST_62"
                     }
-                $CredParsingFunction = "Parse-PrimaryCredential"
-            
+                $CredParsingFunction = "Parse-PrimaryCredential" 
             }
-        elseif($OSVersion -le $WIN_10_1507)
+        elseif(($OSVersion -le $WIN_10_1507) -or ($OSVersion -lt $WIN_10_1511))
             {
                 Write-Debug -Message ("Identified OS Version is " + $OSVersion)
                 Write-Debug -Message ("Credential template identfied and selected")
@@ -1316,7 +1359,7 @@ $Start = Get-Date
             $ParsingFunction = "Get-MSV1_0_LIST_63"
             $CredParsingFunction = "Parse-PrimaryCredential-Win10-old"
             }
-        elseif($OSVersion -le $WIN_10_1511)
+        elseif(($OSVersion -le $WIN_10_1511) -or ($OSVersion -lt $WIN_10_1607))
             {
                 Write-Debug -Message ("Identified OS Version is " + $OSVersion)
                 Write-Debug -Message ("Credential template identfied and selected")
@@ -1327,7 +1370,7 @@ $Start = Get-Date
             $CredParsingFunction = "Parse-PrimaryCredential-Win10"
             
             }
-        elseif($OSVersion -le $WIN_10_1607)
+        elseif(($OSVersion -le $WIN_10_1607) -or ($OSVersion -lt $WIN_10_1703))
             {
                 Write-Debug -Message ("Identified OS Version is " + $OSVersion)
                 Write-Debug -Message ("Credential template identfied and selected")
@@ -1337,7 +1380,7 @@ $Start = Get-Date
             $ParsingFunction = "Get-MSV1_0_LIST_63"
             $CredParsingFunction = "Parse-PrimaryCredential-Win10-1607"    
             }
-        elseif($OSVersion -le $WIN_10_1703)
+        elseif(($OSVersion -le $WIN_10_1703) -or ($OSVersion -lt $WIN_10_1709))
             {
                 Write-Debug -Message ("Identified OS Version is " + $OSVersion)
                 Write-Debug -Message ("Credential template identfied and selected")
@@ -1347,7 +1390,7 @@ $Start = Get-Date
             $ParsingFunction = "Get-MSV1_0_LIST_63"
             $CredParsingFunction = "Parse-PrimaryCredential-Win10-1607"
             }
-        elseif($OSVersion -le $WIN_10_1709)
+        elseif(($OSVersion -le $WIN_10_1709) -or ($OSVersion -lt $WIN_10_1803))
             {
                 Write-Debug -Message ("Identified OS Version is " + $OSVersion)
                 Write-Debug -Message ("Credential template identfied and selected")
@@ -1357,7 +1400,7 @@ $Start = Get-Date
             $ParsingFunction = "Get-MSV1_0_LIST_63"
             $CredParsingFunction = "Parse-PrimaryCredential-Win10-1607"
             }
-        elseif($OSVersion -le $WIN_10_1803)
+        elseif(($OSVersion -le $WIN_10_1803) -or ($OSVersion -lt $WIN_10_1809))
             {
                 Write-Debug -Message ("Identified OS Version is " + $OSVersion)
                 Write-Debug -Message ("Credential template identfied and selected")
@@ -1399,6 +1442,260 @@ $Start = Get-Date
     
         }
     
+    function Get-BCRYPT_HANDLE_KEY 
+    {
+    Param(
+        [int64]$InitialPosition,
+        $Dump,
+        $PathToDMP,
+        $keystruct
+    )
+
+
+    $BCRYPT_HANDLE_KEY = New-Object -Type psobject -Property (@{
+        "size" = $null
+        "tag" = $null
+        "halgorithm" = $null
+        "ptr_key" = $null
+        "BCRYPT_KEY" = $null
+        "unk0" = $null
+        })
+
+
+    $fileStream = New-Object –TypeName System.IO.FileStream –ArgumentList ($PathToDMP, [System.IO.FileMode]::Open, [System.IO.FileAccess]::Read)
+    $fileReader = New-Object –TypeName System.IO.BinaryReader –ArgumentList $fileStream
+    $fileReader.BaseStream.Seek($InitialPosition,[System.IO.SeekOrigin]::Begin) | Out-Null
+
+
+    $size =Convert-LitEdian (([System.BitConverter]::ToString($fileReader.ReadBytes(4))).replace('-',''))
+    $tag = Convert-LitEdian (([System.BitConverter]::ToString($fileReader.ReadBytes(4))).replace('-',''))
+    $halgorithm =Convert-LitEdian ([System.BitConverter]::ToString($fileReader.ReadBytes(8))).replace('-','')
+    $ptr_key = Convert-LitEdian ([System.BitConverter]::ToString($fileReader.ReadBytes(8))).replace('-','')
+
+    if($keystruct -eq "Get-BCRYPT_KEY")
+        {
+        $BCRYPT_KEY = Get-BCRYPT_KEY -PathToDMP $PathToDMP -Dump $Dump -InitialPosition (Get-MemoryAddress -MemoryAddress $ptr_key  -MemoryRanges64 $Dump.Memory64ListStream -PathToDMP $PathToDMP).position
+        }
+    elseif($keystruct -eq "Get-BCRYPT_KEY8")
+        {
+        $BCRYPT_KEY = Get-BCRYPT_KEY8 -PathToDMP $PathToDMP -Dump $Dump -InitialPosition (Get-MemoryAddress -MemoryAddress $ptr_key  -MemoryRanges64 $Dump.Memory64ListStream -PathToDMP $PathToDMP).position
+        }
+    else
+        {
+        $BCRYPT_KEY = Get-BCRYPT_KEY81 -PathToDMP $PathToDMP -Dump $Dump -InitialPosition (Get-MemoryAddress -MemoryAddress $ptr_key  -MemoryRanges64 $Dump.Memory64ListStream -PathToDMP $PathToDMP).position
+        }
+    $unk0 = Convert-LitEdian ([System.BitConverter]::ToString($fileReader.ReadBytes(8))).replace('-','')
+
+
+
+    $BCRYPT_HANDLE_KEY = New-Object -Type psobject -Property (@{
+        "size" = $size
+        "tag" = $tag
+        "halgorithm" = $halgorithm
+        "ptr_key" = $ptr_key
+        "BCRYPT_KEY" = $BCRYPT_KEY
+        "unk0" = $unk0
+        })
+    
+    return $BCRYPT_HANDLE_KEY
+    }
+
+
+
+    function Get-BCRYPT_KEY
+        {
+        Param(
+            [int64]$InitialPosition,
+            $Dump,
+            $PathToDMP
+        )
+        
+ 
+        $BCRYPT_KEY = New-Object -Type psobject -Property (@{
+            "size" = $null
+            "tag" = $null
+            "type" = $null
+            "unk0" = $null
+            "unk1" = $null
+            "unk2" = $null
+            "hardkey" = $null
+            })
+        $fileStream = New-Object –TypeName System.IO.FileStream –ArgumentList ($PathToDMP, [System.IO.FileMode]::Open, [System.IO.FileAccess]::Read)
+        $fileReader = New-Object –TypeName System.IO.BinaryReader –ArgumentList $fileStream
+        $fileReader.BaseStream.Seek($InitialPosition,[System.IO.SeekOrigin]::Begin) | Out-Null
+
+        $size =Convert-LitEdian (([System.BitConverter]::ToString($fileReader.ReadBytes(4))).replace('-',''))
+        $tag =Convert-LitEdian (([System.BitConverter]::ToString($fileReader.ReadBytes(4))).replace('-',''))
+        $type =Convert-LitEdian (([System.BitConverter]::ToString($fileReader.ReadBytes(4))).replace('-',''))
+        $unk0=Convert-LitEdian (([System.BitConverter]::ToString($fileReader.ReadBytes(4))).replace('-',''))
+        $unk1=Convert-LitEdian (([System.BitConverter]::ToString($fileReader.ReadBytes(4))).replace('-',''))
+        $unk2=Convert-LitEdian (([System.BitConverter]::ToString($fileReader.ReadBytes(4))).replace('-',''))
+        $Hardkey = Get-HARD_KEY -InitialPosition $fileReader.BaseStream.Position -Dump $Dump -PathToDMP $PathToDMP
+
+        $BCRYPT_KEY = New-Object -Type psobject -Property (@{
+            "size" = $size
+            "tag" = $tag
+            "type" = $Type
+            "unk0" = $unk0
+            "unk1" = $unk1
+            "unk2" = $unk2
+            "hardkey" = $Hardkey
+            })
+
+        return $BCRYPT_KEY
+        }
+    
+    function Get-HARD_KEY
+        {
+        Param(
+            [int64]$InitialPosition,
+            $Dump,
+            $PathToDMP
+        )
+
+        $HARD_KEY = New-Object -Type psobject -Property (@{
+            "cbSecret" = $null
+            "Data" = $null
+            })
+        $fileStream = New-Object –TypeName System.IO.FileStream –ArgumentList ($PathToDMP, [System.IO.FileMode]::Open, [System.IO.FileAccess]::Read)
+        $fileReader = New-Object –TypeName System.IO.BinaryReader –ArgumentList $fileStream
+        $fileReader.BaseStream.Seek($InitialPosition,[System.IO.SeekOrigin]::Begin) | Out-Null
+
+        $cbSecret =Convert-LitEdian ( ([System.BitConverter]::ToString($fileReader.ReadBytes(4))).replace('-',''))
+        $data =( ([System.BitConverter]::ToString($fileReader.ReadBytes(([convert]::toint64($cbSecret,16))))).replace('-',''))
+
+        $HARD_KEY = New-Object -Type psobject -Property (@{
+            "cbSecret" = $cbSecret
+            "Data" = $Data
+            })
+        
+        return $HARD_KEY
+        }
+
+    function Get-BCRYPT_KEY8
+        {
+            Param(
+                [int64]$InitialPosition,
+                $Dump,
+                $PathToDMP
+            )
+            
+            $BCRYPT_KEY8 = New-Object -Type psobject -Property (@{
+                "size" = $null
+                "tag" = $null
+                "type" = $null
+                "unk0" = $null
+                "unk1" = $null
+                "unk2" = $null
+                "unk3" = $null
+                "unk4" = $null
+                "hardkey" = $null
+                })
+            $fileStream = New-Object –TypeName System.IO.FileStream –ArgumentList ($PathToDMP, [System.IO.FileMode]::Open, [System.IO.FileAccess]::Read)
+            $fileReader = New-Object –TypeName System.IO.BinaryReader –ArgumentList $fileStream
+            $fileReader.BaseStream.Seek($InitialPosition,[System.IO.SeekOrigin]::Begin) | Out-Null
+    
+
+
+            $fileReader.BaseStream.Position=($fileReader.BaseStream.Position+(Get-Align -Position $fileReader.BaseStream.Position -Architecture $Dump.SystemInfoStream.ProcessorArchitecture -Dump $Dump))
+     
+            $size =Convert-LitEdian (([System.BitConverter]::ToString($fileReader.ReadBytes(4))).replace('-',''))
+            $tag =Convert-LitEdian (([System.BitConverter]::ToString($fileReader.ReadBytes(4))).replace('-',''))
+            $type =Convert-LitEdian (([System.BitConverter]::ToString($fileReader.ReadBytes(4))).replace('-',''))
+            $unk0=Convert-LitEdian (([System.BitConverter]::ToString($fileReader.ReadBytes(4))).replace('-',''))
+            $unk1=Convert-LitEdian (([System.BitConverter]::ToString($fileReader.ReadBytes(4))).replace('-',''))
+            $unk2=Convert-LitEdian (([System.BitConverter]::ToString($fileReader.ReadBytes(4))).replace('-',''))
+            $unk3=Convert-LitEdian (([System.BitConverter]::ToString($fileReader.ReadBytes(4))).replace('-',''))
+
+            $fileReader.BaseStream.Position=($fileReader.BaseStream.Position+(Get-Align -Position $fileReader.BaseStream.Position -Architecture $Dump.SystemInfoStream.ProcessorArchitecture -Dump $Dump))
+            $unk4=Convert-LitEdian (([System.BitConverter]::ToString($fileReader.ReadBytes(8))).replace('-',''))
+
+            $Hardkey = Get-HARD_KEY -InitialPosition $fileReader.BaseStream.Position -Dump $Dump -PathToDMP $PathToDMP
+    
+            $BCRYPT_KEY8 = New-Object -Type psobject -Property (@{
+                "size" = $size
+                "tag" = $tag
+                "type" = $type
+                "unk0" = $unk0
+                "unk1" = $unk1
+                "unk2" = $unk2
+                "unk3" = $unk3
+                "unk4" = $unk4
+                "hardkey" = $Hardkey
+                })
+    
+            return $BCRYPT_KEY8
+        }
+
+    Function Get-BCRYPT_KEY81
+        {
+            Param(
+                [int64]$InitialPosition,
+                $Dump,
+                $PathToDMP
+            )
+            
+            $BCRYPT_KEY81 = New-Object -Type psobject -Property (@{
+                "size" = $null
+                "tag" = $null
+                "type" = $null
+                "unk0" = $null
+                "unk1" = $null
+                "unk2" = $null
+                "unk3" = $null
+                "unk4" = $null
+                "unk5" = $null
+                "unk6" = $null
+                "unk7" = $null
+                "unk8" = $null
+                "unk9" = $null
+                "hardkey" = $null
+                })
+            $fileStream = New-Object –TypeName System.IO.FileStream –ArgumentList ($PathToDMP, [System.IO.FileMode]::Open, [System.IO.FileAccess]::Read)
+            $fileReader = New-Object –TypeName System.IO.BinaryReader –ArgumentList $fileStream
+            $fileReader.BaseStream.Seek($InitialPosition,[System.IO.SeekOrigin]::Begin) | Out-Null
+    
+
+
+            $fileReader.BaseStream.Position=($fileReader.BaseStream.Position+(Get-Align -Position $fileReader.BaseStream.Position -Architecture $Dump.SystemInfoStream.ProcessorArchitecture -Dump $Dump))
+     
+            $size =Convert-LitEdian (([System.BitConverter]::ToString($fileReader.ReadBytes(4))).replace('-',''))
+            $tag =Convert-LitEdian (([System.BitConverter]::ToString($fileReader.ReadBytes(4))).replace('-',''))
+            $type =Convert-LitEdian (([System.BitConverter]::ToString($fileReader.ReadBytes(4))).replace('-',''))
+            $unk0=Convert-LitEdian (([System.BitConverter]::ToString($fileReader.ReadBytes(4))).replace('-',''))
+            $unk1=Convert-LitEdian (([System.BitConverter]::ToString($fileReader.ReadBytes(4))).replace('-',''))
+            $unk2=Convert-LitEdian (([System.BitConverter]::ToString($fileReader.ReadBytes(4))).replace('-',''))
+            $unk3=Convert-LitEdian (([System.BitConverter]::ToString($fileReader.ReadBytes(4))).replace('-',''))
+            $unk4=Convert-LitEdian (([System.BitConverter]::ToString($fileReader.ReadBytes(4))).replace('-',''))
+
+            $fileReader.BaseStream.Position=($fileReader.BaseStream.Position+(Get-Align -Position $fileReader.BaseStream.Position -Architecture $Dump.SystemInfoStream.ProcessorArchitecture -Dump $Dump))
+            $unk5=Convert-LitEdian (([System.BitConverter]::ToString($fileReader.ReadBytes(8))).replace('-',''))
+            $unk6=Convert-LitEdian (([System.BitConverter]::ToString($fileReader.ReadBytes(4))).replace('-',''))
+            $unk7=Convert-LitEdian (([System.BitConverter]::ToString($fileReader.ReadBytes(4))).replace('-',''))
+            $unk8=Convert-LitEdian (([System.BitConverter]::ToString($fileReader.ReadBytes(4))).replace('-',''))
+            $unk9=Convert-LitEdian (([System.BitConverter]::ToString($fileReader.ReadBytes(4))).replace('-',''))
+            $Hardkey = Get-HARD_KEY -InitialPosition $fileReader.BaseStream.Position -Dump $Dump -PathToDMP $PathToDMP
+    
+            $BCRYPT_KEY81 = New-Object -Type psobject -Property (@{
+                "size" = $size
+                "tag" = $tag
+                "type" = $type
+                "unk0" = $unk0
+                "unk1" = $unk1
+                "unk2" = $unk2
+                "unk3" = $unk3
+                "unk4" = $unk4
+                "unk5" = $unk5
+                "unk6" = $unk6
+                "unk7" = $unk7
+                "unk8" = $unk8
+                "unk9" = $unk9
+                "hardkey" = $Hardkey
+                })
+    
+            return $BCRYPT_KEY81
+        }
+
     Function Get-CryptoData
         {
         Param(
@@ -1416,7 +1713,7 @@ $Start = Get-Date
         }
         
 
-
+        
         $IVPointerData = Get-MemoryAddress -MemoryAddress ("{0:x16}" -f ([convert]::toint64(($PatternAddress.Virtual_Address).trim(),16) + $CryptoTemplate.'IV-Offset')) -MemoryRanges64 $Dump.Memory64ListStream -PathToDMP $PathToDMP -SizeToRead 4
         $IVPointer = Convert-LitEdian -String $IVPointerData.data
         $IVAddress = ("{0:x16}" -f (([convert]::toint64(($PatternAddress.Virtual_Address).trim(),16) + $CryptoTemplate.'IV-Offset') + ([convert]::toint64(($IVPointer).trim(),16)) +4 ))
@@ -1426,19 +1723,21 @@ $Start = Get-Date
         $FullDESHandleAddress = ("{0:x16}" -f (([convert]::toint64(($PatternAddress.Virtual_Address).trim(),16) + $CryptoTemplate.'DES-Offset') + ([convert]::toint64((Convert-LitEdian -String $DESPointerData.data).trim(),16)) +4 ))
         $RawDESHandleData = Convert-LitEdian (Get-MemoryAddress -MemoryAddress $FullDESHandleAddress  -MemoryRanges64 $Dump.Memory64ListStream -PathToDMP $PathToDMP -SizeToRead 8).data
 
-        $DESHandle = ("{0:x16}" -f ([convert]::toint64($RawDESHandleData,16) + 80 + 12))
-        $DESKey = (Get-MemoryAddress -MemoryAddress $DESHandle  -MemoryRanges64 $Dump.Memory64ListStream -PathToDMP $PathToDMP -SizeToRead 24).data
-    
+        $DESHandle = ("{0:x16}" -f ([convert]::toint64($RawDESHandleData,16)))
+
+        $DESKey = Get-BCRYPT_HANDLE_KEY -InitialPosition (Get-MemoryAddress -MemoryAddress $DESHandle  -MemoryRanges64 $Dump.Memory64ListStream -PathToDMP $PathToDMP).position -Dump $dump -PathToDMP $PathtoDMP -keystruct $CryptoTemplate.'key-struct'
+        
         $AESPointerData = Get-MemoryAddress -MemoryAddress ("{0:x16}" -f ([convert]::toint64(($PatternAddress.Virtual_Address).trim(),16) + $CryptoTemplate.'AES-Offset')) -MemoryRanges64 $Dump.Memory64ListStream -PathToDMP $PathToDMP -SizeToRead 4
         $FullAESHandleAddress = ("{0:x16}" -f (([convert]::toint64(($PatternAddress.Virtual_Address).trim(),16) + $CryptoTemplate.'AES-Offset') + ([convert]::toint64((Convert-LitEdian -String $AESPointerData.data).trim(),16)) +4 ))
         $RawAESHandleData = Convert-LitEdian (Get-MemoryAddress -MemoryAddress $FullAESHandleAddress  -MemoryRanges64 $Dump.Memory64ListStream -PathToDMP $PathToDMP -SizeToRead 8).data
-        $AESHandle = ("{0:x16}" -f ([convert]::toint64($RawAESHandleData,16) + 80 + 12))
-        $AESKey = (Get-MemoryAddress -MemoryAddress $AESHandle  -MemoryRanges64 $Dump.Memory64ListStream -PathToDMP $PathToDMP -SizeToRead 16).data
+        $AESHandle = ("{0:x16}" -f ([convert]::toint64($RawAESHandleData,16)))
+        
+        $AESKey =  Get-BCRYPT_HANDLE_KEY -InitialPosition (Get-MemoryAddress -MemoryAddress $AESHandle  -MemoryRanges64 $Dump.Memory64ListStream -PathToDMP $PathToDMP).position -Dump $dump -PathToDMP $PathtoDMP -keystruct $CryptoTemplate.'key-struct'
     
         $CryptoData = New-Object -Type psobject -Property (@{
             IV = $IV
-            DESKey = $DESKey
-            AESKey = $AESKey
+            DESKey = $DESKey.BCRYPT_KEY.hardkey.Data
+            AESKey = $AESKey.BCRYPT_KEY.hardkey.Data
             })
         return $CryptoData
         }
@@ -1552,10 +1851,12 @@ $Start = Get-Date
                 "username" = $null
                 "Domaine" = $null
                 "unk14" = $null
+                "unk15" = $null
                 "Type" = $null
                 "PSID" = $null
                 "LogonType" = $null
                 "unk18" = $null
+                "Session" = $null
                 "logontime" = $null
                 "LogonServer" = $null
                 "CredentialListPt" = $null
@@ -1750,10 +2051,12 @@ $Start = Get-Date
                 "username" = $username
                 "Domain" = $Domain
                 "unk14" = $unk14
+                "unk15" = $unk15
                 "Type" = $Type
                 "PSID" = $PSID
                 "LogonType" = $LogonType
                 "unk18" = $unk18
+                "Session" = $session
                 "logontime" = $logontime
                 "LogonServer" = $LogonServer
                 "CredentialListPt" = $CredentialListPt
@@ -1810,10 +2113,12 @@ $Start = Get-Date
                 "username" = $null
                 "Domain" = $null
                 "unk14" = $null
+                "unk15" = $null
                 "Type" = $null
                 "PSID" = $null
                 "LogonType" = $null
                 "unk18" = $null
+                "Session" = $null
                 "logontime" = $null
                 "LogonServer" = $null
                 "CredentialListPt" = $null
@@ -2022,10 +2327,12 @@ $Start = Get-Date
             "username" = $username
             "Domain" = $Domain
             "unk14" = $unk14
+            "unk15" = $unk15
             "Type" = $Type
             "PSID" = $PSID
             "LogonType" = $LogonType
             "unk18" = $unk18
+            "Session" = $session
             "logontime" = $logontime
             "LogonServer" = $LogonServer
             "CredentialListPt" = $CredentialListPt
@@ -2047,6 +2354,192 @@ $Start = Get-Date
         return  $MSV1_0_LIST_62
         }
     
+        function Get-MSV1_0_LIST_61
+        {
+            Param(
+                [int64]$InitialPosition,
+                $StartAddress,
+                $DESKey,
+                $IV,
+                $Dump,
+                $CredentialParsingFunction, 
+                $PathToDMP
+            )
+                $MSV1_0_LIST_61 = New-Object -Type psobject -Property (@{
+                    "flink" = $null
+                    "blink" = $null
+                    "unk0" = $null
+                    "unk1" = $null
+                    "unk2" = $null
+                    "unk3" = $null
+                    "unk4" = $null
+                    "unk5" = $null
+                    "hSemaphore6" = $null
+                    "unk7" = $null
+                    "hSemaphore8" = $null
+                    "unk9" = $null
+                    "unk10" = $null
+                    "unk11" = $null
+                    "unk12" = $null
+                    "unk13" = $null
+                    "LocallyUniqueIdentifier" = $null
+                    "SecondaryLocallyUniqueIdentifier" = $null
+                    "username" = $null
+                    "Domaine" = $null
+                    "unk14" = $null
+                    "unk15" = $null
+                    "PSID" = $null
+                    "LogonType" = $null
+                    "Session" = $null
+                    "logontime" = $null
+                    "LogonServer" = $null
+                    "CredentialListPt" = $null
+                    "MSV1_0_CREDENTIAL_LIST" = $null
+                    "unk19" = $null
+                    "unk20" = $null
+                    "unk21" = $null
+                    "unk22" = $null
+                    "CredentialManager" = $null
+                    })
+            
+        
+        
+        
+        
+                $username = New-Object -Type psobject -Property (@{
+                    "Position" = $Null
+                    "Length" =  $null
+                    "MaxLength" = $null 
+                    "Buffer" = $null
+                    })
+        
+                $Domain = New-Object -Type psobject -Property (@{
+                            "Position" = $Null
+                            "Length" =  $null 
+                            "MaxLength" = $null 
+                            "Buffer" = $null 
+                            })
+        
+                $Type = New-Object -Type psobject -Property (@{
+                            "Position" = $Null
+                            "Length" =  $null
+                            "MaxLength" = $null
+                            "Buffer" = $null
+                            })
+        
+                $LogonServer = New-Object -Type psobject -Property (@{
+                            "Position" = $Null
+                            "Length" =  $null 
+                            "MaxLength" = $null 
+                            "Buffer" = $null 
+                            })
+                        
+                $fileStream = New-Object –TypeName System.IO.FileStream –ArgumentList ($PathToDMP, [System.IO.FileMode]::Open, [System.IO.FileAccess]::Read)
+                $fileReader = New-Object –TypeName System.IO.BinaryReader –ArgumentList $fileStream
+                $fileReader.BaseStream.Seek($InitialPosition,[System.IO.SeekOrigin]::Begin) | Out-Null
+                
+                
+                $flink = Convert-LitEdian -String ([System.BitConverter]::ToString($fileReader.ReadBytes(8))).replace('-','')      
+                $blink = Convert-LitEdian -String ([System.BitConverter]::ToString($fileReader.ReadBytes(8))).replace('-','')
+                $unk0 = Convert-LitEdian -String ([System.BitConverter]::ToString($fileReader.ReadBytes(8))).replace('-','')
+                $unk1 = Convert-LitEdian -String ([System.BitConverter]::ToString($fileReader.ReadBytes(4))).replace('-','')
+                $fileReader.BaseStream.Position=($fileReader.BaseStream.Position+(Get-Align -Position $fileReader.BaseStream.Position -Architecture $Dump.SystemInfoStream.ProcessorArchitecture -Dump $Dump))
+                $unk2 = Convert-LitEdian -String ([System.BitConverter]::ToString($fileReader.ReadBytes(8))).replace('-','')
+                $unk3 = Convert-LitEdian -String ([System.BitConverter]::ToString($fileReader.ReadBytes(4))).replace('-','')
+                $unk4 = Convert-LitEdian -String ([System.BitConverter]::ToString($fileReader.ReadBytes(4))).replace('-','')
+                $unk5 = Convert-LitEdian -String ([System.BitConverter]::ToString($fileReader.ReadBytes(4))).replace('-','')
+                $fileReader.BaseStream.Position=($fileReader.BaseStream.Position+(Get-Align -Position $fileReader.BaseStream.Position -Architecture $Dump.SystemInfoStream.ProcessorArchitecture -Dump $Dump))
+                $hSemaphore6 = Convert-LitEdian -String ([System.BitConverter]::ToString($fileReader.ReadBytes(8))).replace('-','')
+                $unk7 = Convert-LitEdian -String ([System.BitConverter]::ToString($fileReader.ReadBytes(8))).replace('-','') 
+                $hSemaphore8 = Convert-LitEdian -String ([System.BitConverter]::ToString($fileReader.ReadBytes(8))).replace('-','')
+                $unk9 = Convert-LitEdian -String ([System.BitConverter]::ToString($fileReader.ReadBytes(8))).replace('-','') 
+                $unk10 = Convert-LitEdian -String ([System.BitConverter]::ToString($fileReader.ReadBytes(8))).replace('-','')
+                $unk11 = Convert-LitEdian -String ([System.BitConverter]::ToString($fileReader.ReadBytes(4))).replace('-','') 
+                $unk12 = Convert-LitEdian -String ([System.BitConverter]::ToString($fileReader.ReadBytes(4))).replace('-','')
+                $unk13 = Convert-LitEdian -String ([System.BitConverter]::ToString($fileReader.ReadBytes(8))).replace('-','')
+                $LocallyUniqueIdentifier = Get-LUID ([System.BitConverter]::ToString($fileReader.ReadBytes(8))).replace('-','')
+                $SecondaryLocallyUniqueIdentifier = Get-LUID ([System.BitConverter]::ToString($fileReader.ReadBytes(8))).replace('-','')
+                $username.Position = $fileReader.BaseStream.Position
+                $username.Length = Convert-LitEdian -String ([System.BitConverter]::ToString($fileReader.ReadBytes(2))).replace('-','')
+                $username.MaxLength = Convert-LitEdian -String ([System.BitConverter]::ToString($fileReader.ReadBytes(2))).replace('-','')
+                $fileReader.BaseStream.Position=($fileReader.BaseStream.Position+(Get-Align -Position $fileReader.BaseStream.Position -Architecture $Dump.SystemInfoStream.ProcessorArchitecture -Dump $Dump)) # | Out-Null
+                $username.Buffer = Convert-LitEdian -String ([System.BitConverter]::ToString($fileReader.ReadBytes(8))).replace('-','')
+                $Domain.Position = $fileReader.BaseStream.Position
+                $Domain.Length = Convert-LitEdian -String ([System.BitConverter]::ToString($fileReader.ReadBytes(2))).replace('-','')
+                $Domain.MaxLength = Convert-LitEdian -String ([System.BitConverter]::ToString($fileReader.ReadBytes(2))).replace('-','')
+                $fileReader.BaseStream.Position=($fileReader.BaseStream.Position+(Get-Align -Position $fileReader.BaseStream.Position -Architecture $Dump.SystemInfoStream.ProcessorArchitecture -Dump $Dump)) # | Out-Null
+                $Domain.Buffer = Convert-LitEdian -String ([System.BitConverter]::ToString($fileReader.ReadBytes(8))).replace('-','')
+                $unk14 = Convert-LitEdian -String ([System.BitConverter]::ToString($fileReader.ReadBytes(8))).replace('-','')
+                $unk15 = Convert-LitEdian -String ([System.BitConverter]::ToString($fileReader.ReadBytes(8))).replace('-','')
+                $PSID = Convert-LitEdian -String ([System.BitConverter]::ToString($fileReader.ReadBytes(8))).replace('-','')
+                $LogonType = Convert-LitEdian -String ([System.BitConverter]::ToString($fileReader.ReadBytes(4))).replace('-','')
+                $session = Convert-LitEdian -String ([System.BitConverter]::ToString($fileReader.ReadBytes(4))).replace('-','')
+                $fileReader.BaseStream.Position=($fileReader.BaseStream.Position+(Get-Align -Position $fileReader.BaseStream.Position -Architecture $Dump.SystemInfoStream.ProcessorArchitecture -Dump $Dump)) # | Out-Null
+                $logontime = Convert-LitEdian -String ([System.BitConverter]::ToString($fileReader.ReadBytes(8))).replace('-','')
+                $LogonServer.Position = $fileReader.BaseStream.Position
+                $LogonServer.Length = Convert-LitEdian -String ([System.BitConverter]::ToString($fileReader.ReadBytes(2))).replace('-','')
+                $LogonServer.MaxLength = Convert-LitEdian -String ([System.BitConverter]::ToString($fileReader.ReadBytes(2))).replace('-','')
+                $fileReader.BaseStream.Position=($fileReader.BaseStream.Position+(Get-Align -Position $fileReader.BaseStream.Position -Architecture $Dump.SystemInfoStream.ProcessorArchitecture -Dump $Dump)) # | Out-Null
+                $LogonServer.Buffer = Convert-LitEdian -String ([System.BitConverter]::ToString($fileReader.ReadBytes(8))).replace('-','')
+                $CredentialListPtr = Convert-LitEdian -String ([System.BitConverter]::ToString($fileReader.ReadBytes(8))).replace('-','')
+                
+                if($CredentialListPtr -eq "0000000000000000")
+                    {
+                    $MSV1_0_CREDENTIAL_LIST = "N/A"
+                    }
+                else
+                    {
+                
+                    $MSV1_0_CREDENTIAL_LIST = Get-MSV1_0_CREDENTIAL_LIST -InitialPosition (Get-MemoryAddress -MemoryAddress $CredentialListPtr -MemoryRanges64 $Dump.Memory64ListStream -PathToDMP $PathToDMP).position -StartAddress $CredentialListPtr -DESKey $DESKey -IV $IV -Dump $Dump -PathToDMP $PathToDMP -CredentialParsingFunction $CredentialParsingFunction
+                
+                    }
+                
+                $unk19 = Convert-LitEdian -String ([System.BitConverter]::ToString($fileReader.ReadBytes(8))).replace('-','')
+                $unk20 = Convert-LitEdian -String ([System.BitConverter]::ToString($fileReader.ReadBytes(8))).replace('-','')
+                $unk21 = Convert-LitEdian -String ([System.BitConverter]::ToString($fileReader.ReadBytes(8))).replace('-','')
+                $unk22 = Convert-LitEdian -String ([System.BitConverter]::ToString($fileReader.ReadBytes(4))).replace('-','')
+                $fileReader.BaseStream.Position=($fileReader.BaseStream.Position+(Get-Align -Position $fileReader.BaseStream.Position -Architecture $Dump.SystemInfoStream.ProcessorArchitecture -Dump $Dump)) # | Out-Null
+                $CredentialManager = Convert-LitEdian -String ([System.BitConverter]::ToString($fileReader.ReadBytes(8))).replace('-','')        
+        
+                $MSV1_0_LIST_61 = New-Object -Type psobject -Property (@{
+                    "flink" = $flink
+                    "blink" = $blink
+                    "unk0" = $unk0
+                    "unk1" = $unk1
+                    "unk2" = $unk2
+                    "unk3" = $unk3
+                    "unk4" = $unk4
+                    "unk5" = $unk5
+                    "hSemaphore6" = $hSemaphore6
+                    "unk7" = $unk7
+                    "hSemaphore8" = $hSemaphore8
+                    "unk9" = $unk9
+                    "unk10" = $unk10
+                    "unk11" = $unk11
+                    "unk12" = $unk12
+                    "unk13" = $unk13
+                    "LocallyUniqueIdentifier" = $LocallyUniqueIdentifier
+                    "SecondaryLocallyUniqueIdentifier" = $SecondaryLocallyUniqueIdentifier
+                    "username" = $username
+                    "Domain" = $Domain
+                    "unk14" = $unk14
+                    "unk15" = $unk15
+                    "PSID" = $PSID
+                    "LogonType" = $LogonType
+                    "Session" = $session
+                    "logontime" = $logontime
+                    "LogonServer" = $LogonServe
+                    "CredentialListPt" = $CredentialListPtr
+                    "MSV1_0_CREDENTIAL_LIST" = $MSV1_0_CREDENTIAL_LIST
+                    "unk19" = $unk19
+                    "unk20" = $unk20
+                    "unk21" = $unk21
+                    "unk22" = $unk22
+                    "CredentialManager" = $CredentialManager
+                    })
+        
+                    return  $MSV1_0_LIST_61
+        }
     function Get-MSV1_0_CREDENTIAL_LIST
         {
         Param(
@@ -2184,6 +2677,21 @@ $Start = Get-Date
             "isLmOwfPassword" = $null
             "isShaOwPassword" =$null
              })
+
+        $LogonDomainName = New-Object -Type psobject -Property (@{
+                "Position" = $Null
+                "Length" =  $null # 2 Bytes
+                "MaxLength" = $null # 2 Bytes
+                "Buffer" = $null # 8 Bytes
+                "Data" = $null
+                })
+        $DecUsername = New-Object -Type psobject -Property (@{
+                "Position" = $Null
+                "Length" =  $null # 2 Bytes
+                "MaxLength" = $null # 2 Bytes
+                "Buffer" = $null # 8 Bytes
+                "Data" = $null
+                })
     
         $Position = 0
         $LogonDomainName.Position = $Position
@@ -3006,7 +3514,12 @@ $Start = Get-Date
                 }
             $CredEntryAddressInitialPosition = Get-MemoryAddress -MemoryAddress $NEntry  -MemoryRanges64 $Dump.Memory64ListStream -PathToDMP $PathToDMP
             $CredentialEntry = $null
-            if($CredTemplate.ParsingFunction -eq "Get-MSV1_0_LIST_62")
+            if($CredTemplate.ParsingFunction -eq "Get-MSV1_0_LIST_61")
+                {
+                $CredentialEntry = Get-MSV1_0_LIST_61 -InitialPosition $CredEntryAddressInitialPosition.position -StartAddress $NEntry -DESKey $Crypto.DESKey -IV $Crypto.IV -PathToDMP $PathToDMP -Dump $Dump -CredentialParsingFunction $CredTemplate.CredParsingFunction
+                }
+            
+            elseif($CredTemplate.ParsingFunction -eq "Get-MSV1_0_LIST_62")
                 {
                 $CredentialEntry = Get-MSV1_0_LIST_62 -InitialPosition $CredEntryAddressInitialPosition.position -StartAddress $NEntry -DESKey $Crypto.DESKey -IV $Crypto.IV -PathToDMP $PathToDMP -Dump $Dump -CredentialParsingFunction $CredTemplate.CredParsingFunction
                 }
