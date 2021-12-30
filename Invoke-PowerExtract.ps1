@@ -3246,7 +3246,7 @@ $Start = Get-Date
             $DebugPreference = "SilentlyContinue"
     }
     
-    if((Test-Path $PathToDMP) -and ($PathToDMP.Length -gt 0))
+    if([System.IO.File]::Exists($PathToDMP))
         {
         Write-Debug -Message ("Inputfile valid and identified in: " + $PathToDMP)
 
