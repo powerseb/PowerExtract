@@ -4,36 +4,36 @@ This tool is able to parse memory dumps of the LSASS process without any additio
 
 Important: The script holds no functionality to create dump files - it will just read them.
 
+# Usage 
+
+So you just want to read a created dump file? The usage is quite simple:
+```powershell
+ Invoke-PowerExtract -PathToDMP C:\temp\lsass.dmp
+```
 
 Currently supported Windows Versions (64bit only):
 
 Clients:
 
-Windows 10
-Windows 8.1
-windows 8
-Windows 7
+- Windows 10
+- Windows 8.1
+- windows 8
+- Windows 7
 
 Server:
 
-Windows Server 2019
-Windows Server 2016
-Windows Server 2012R2
-Windows Server 2012
-Windows Server 2008R2 (implemented - tests ongoing)
-Windows Server 2008
+- Windows Server 2019
+- Windows Server 2016
+- Windows Server 2012R2
+- Windows Server 2012
+- Windows Server 2008R2 (implemented - tests ongoing)
+- Windows Server 2008
 
 Currently open:
 
-Windows 11
-Windows Server 2022
+- Windows 11
+- Windows Server 2022
 
-# Usage 
-
-The is quite simple:
-```powershell
- Invoke-PowerExtract -PathToDMP C:\temp\lsass.dmp
-```
 
 # Future Plans
 
