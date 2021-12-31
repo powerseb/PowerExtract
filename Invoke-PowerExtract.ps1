@@ -1289,21 +1289,21 @@ $Start = Get-Date
                 Write-Debug -Message ("Identified OS Version is " + $OSVersion)
                 Write-Debug -Message ("Currently no credential template for the detected OS Version present - Script will be terminated")
                 Start-Sleep -Seconds 3
-                Exit
+                Break
             }
         elseif(($OSVersion -le $WIN_2K3) -or ($OSVersion -lt $WIN_VISTA))
             {
                 Write-Debug -Message ("Identified OS Version is " + $OSVersion)
                 Write-Debug -Message ("Currently no credential template for the detected OS Version present - Script will be terminated") 
                 Start-Sleep -Seconds 3
-                Exit  
+                Break 
             }
         elseif(($OSVersion -le $WIN_VISTA) -or ($OSVersion -lt $WIN_7))
             {
                 Write-Debug -Message ("Identified OS Version is " + $OSVersion)
                 Write-Debug -Message ("Currently no credential template for the detected OS Version present - Script will be terminated")    
                 Start-Sleep -Seconds 3
-                Exit
+                Break
             }
         elseif(($OSVersion -le $WIN_7) -or ($OSVersion -lt $WIN_8))
             {
@@ -1697,12 +1697,18 @@ $Start = Get-Date
         )
     
         $CryptoTemplate = Select-CryptoTemplate -OSVersion ([convert]::toint64($Dump.SystemInfoStream.BuildNumber,16)) -OSArch $Dump.SystemInfoStream.ProcessorArchitecture
+        if ($CryptoTemplate.Pattern -eq $Null) {
+            Write-Debug -Message ("Crypto Template not found - Script will be terminated")
+            Start-Sleep -Seconds 2
+            Break
+        }
+        
         $PatternAddress = Find-PatternInModule -ModuleName "lsasrv.dll" -Pattern $CryptoTemplate.Pattern
         
         if ($PatternAddress -eq $Null) {
             Write-Debug -Message ("Crypto Pattern not found - Script will be terminated")
             Start-Sleep -Seconds 2
-            exit
+            Break
         }
         
 
@@ -1742,11 +1748,17 @@ $Start = Get-Date
                 $Dump
             )
         $MSV = Select-MSVTemplate -OSVersion ([convert]::toint64($Dump.SystemInfoStream.BuildNumber,16)) -OSArch $Dump.SystemInfoStream.ProcessorArchitecture -LSATimestamp ([convert]::toint64(($Dump.ModuleListStream | where {$_.ModuleName -like "*lsasrv.dll*"}).TimeDateStamp,16))
+        if ($MSV.Pattern -eq $Null) {
+            Write-Debug -Message ("Credential Template not found - Script will be terminated")
+            Start-Sleep -Seconds 2
+            Break
+        } 
+        
         $PatternAddress = Find-PatternInModule -ModuleName "lsasrv.dll" -Pattern $MSV.Pattern
         if ($PatternAddress -eq $Null) {
             Write-Debug -Message ("Credential Pattern not found - Script will be terminated")
             Start-Sleep -Seconds 2
-            exit
+            Break
         }    
         $SessionPointerAddress = ("{0:x16}" -f (([convert]::toint64(($PatternAddress.Virtual_Address).trim(),16) + $MSV.SessionNo)))
         $SessionPointer = Convert-LitEdian -String (Get-MemoryAddress -MemoryAddress $SessionPointerAddress  -MemoryRanges64 $Dump.Memory64ListStream -PathToDMP $PathToDMP -SizeToRead 4).data 
@@ -3255,7 +3267,7 @@ $Start = Get-Date
         {
         Write-Debug -Message ("Inputfile could not be found under: " + $PathToDMP)
         Write-Debug -Message ("Script is terminated")
-        Exit
+        Break
         }
 
 
@@ -3413,6 +3425,11 @@ $Start = Get-Date
 
 
     $Crypto = Get-CryptoData -PathToDMP $PathToDMP -Dump $Dump
+    if($Crypto.IV -eq $null)
+        {
+            Write-Debug -Message ("No Crypto Material could be extracted - Script is terminated.")
+            Break
+        }
     Write-Debug -Message ("Crypto Material extracted: ")
     Write-Debug -Message ("DESKey: " + $Crypto.DESKey)
     Write-Debug -Message ("AESKey: " + $Crypto.AESKey)
