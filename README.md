@@ -1,6 +1,6 @@
 # Invoke-PowerExtract
 
-This tool is able to parse memory dumps of the LSASS process without any additional tools (e.g. Debuggers) or additional sideloading of mimikatz. It is a pure PowerShell implementation for parsing and extracting secrets (currently limited to NT-Hashes) of the LSASS process.
+This tool is able to parse memory dumps of the LSASS process without any additional tools (e.g. Debuggers) or additional sideloading of mimikatz. It is a pure PowerShell implementation for parsing and extracting secrets (LSA / MSV and Kerberos) of the LSASS process.
 
 Important: The script holds no functionality to create dump files - it will just read them.
 
@@ -10,6 +10,8 @@ So you just want to read a created dump file? The usage is quite simple:
 ```powershell
  Invoke-PowerExtract -PathToDMP C:\temp\lsass.dmp
 ```
+
+![Example Extraction with the option "format-list"](Extraction.gif)
 
 Currently supported Windows Versions (64bit only):
 
@@ -26,7 +28,7 @@ Server:
 - Windows Server 2016
 - Windows Server 2012R2
 - Windows Server 2012
-- Windows Server 2008R2 (implemented - tests ongoing)
+- Windows Server 2008R2
 - Windows Server 2008
 
 Currently open:
@@ -37,5 +39,5 @@ Currently open:
 
 # Future Plans
 
- Mid-term I will add additional authentication packages (e.g. Kerberos).
+ Short-term I plan to implement the correct parsing of Kerberos Tickets to a format which can be read by Rubeus etc. - Currently Kerberos tickets are parsed but not transformed to the correct format. 
  
