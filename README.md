@@ -17,6 +17,7 @@ Currently supported Windows Versions (64bit only):
 
 Clients:
 
+- Windows 11
 - Windows 10
 - Windows 8.1
 - Windows 8
@@ -24,6 +25,7 @@ Clients:
 
 Server:
 
+- Windows Server 2022
 - Windows Server 2019
 - Windows Server 2016
 - Windows Server 2012R2
@@ -31,13 +33,14 @@ Server:
 - Windows Server 2008R2
 - Windows Server 2008
 
-Currently open:
-
-- Windows 11
-- Windows Server 2022
-
 
 # Future Plans
 
  Short-term I plan to implement the correct parsing of Kerberos Tickets to a format which can be read by Rubeus etc. - Currently Kerberos tickets are parsed but not transformed to the correct format. 
+
+# References 
+
+Many thanks and a big shout out to the pypykatz project which was the inspiration and source for this project:
+
+https://github.com/skelsec/pypykatz
  
