@@ -38,6 +38,10 @@ Server:
 
  Short-term I plan to implement the correct parsing of Kerberos Tickets to a format which can be read by Rubeus etc. - Currently Kerberos tickets are parsed but not transformed to the correct format. 
 
+# How did you do it?
+
+I wrote a little article about it here - https://powerseb.github.io/posts/LSASS-parsing-without-a-cat/ 
+
 # References 
 
 Many thanks and a big shout out to the pypykatz project which was the inspiration and source for this project:
