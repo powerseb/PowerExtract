@@ -36,7 +36,7 @@ Server:
 
 # Future Plans
 
- Short-term I plan to implement the correct parsing of Kerberos Tickets to a format which can be read by Rubeus etc. - Currently Kerberos tickets are parsed but not transformed to the correct format. 
+Short-term I plan to implement the correct parsing of Kerberos Tickets to a format which can be read by Rubeus etc. - Currently Kerberos tickets are parsed but not transformed to the correct format - this is completed (more complex than I thought) . 
 
 # How did you do it?
 
