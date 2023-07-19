@@ -10,6 +10,11 @@ So you just want to read a created dump file? The usage is quite simple:
 ```powershell
  Invoke-PowerExtract -PathToDMP C:\temp\lsass.dmp
 ```
+and for kerberos tickets
+```powershell
+ Invoke-PowerExtract -PathToDMP C:\temp\lsass.dmp -GetMeTickets $true
+```
+
 
 ![Example Extraction with the option "format-list"](Extraction.gif)
 
@@ -41,10 +46,15 @@ Short-term I plan to implement the correct parsing of Kerberos Tickets to a form
 # How did you do it?
 
 I wrote a little article about it here - https://powerseb.github.io/posts/LSASS-parsing-without-a-cat/ 
+Kerberos in the making (i need to recover from those hex strings) 
 
 # References 
 
 Many thanks and a big shout out to the pypykatz project which was the inspiration and source for this project:
 
 https://github.com/skelsec/pypykatz
+
+Additionally AADInternals provided some inspiration for the kerberos ticket part:
+
+https://github.com/Gerenios/AADInternals 
  
