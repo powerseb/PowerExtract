@@ -1246,7 +1246,7 @@ $Start = Get-Date
                     })
         
             }
-        elseif($OSVersion -lt $WIN_10_1809)
+        elseif($OSVersion -le $WIN_10_1809)
             {
                 Write-Debug -Message ("Identified OS Version is " + $OSVersion)
                 Write-Debug -Message ("Crypto template identfied and selected")
@@ -3770,8 +3770,14 @@ $Start = Get-Date
         $Domain.MaxLength = Convert-LitEdian -String ([System.BitConverter]::ToString($fileReader.ReadBytes(2))).replace('-','')
         $fileReader.BaseStream.Position=($fileReader.BaseStream.Position+(Get-Align -Position $fileReader.BaseStream.Position -Architecture $Dump.SystemInfoStream.ProcessorArchitecture -Dump $Dump)) # | Out-Null
         $Domain.Buffer = Convert-LitEdian -String ([System.BitConverter]::ToString($fileReader.ReadBytes(8))).replace('-','')
-        $Domain.Data =  Get-CharsFromHex -HexString (Get-MemoryAddress -MemoryAddress $Domain.Buffer -MemoryRanges64 $Dump.Memory64ListStream -SizeToRead ([convert]::toint64(($Domain.MaxLength).trim(),16)) -PathToDMP $PathToDMP).Data
-        
+        try {
+            $Domain.Data =  Get-CharsFromHex -HexString (Get-MemoryAddress -MemoryAddress $Domain.Buffer -MemoryRanges64 $Dump.Memory64ListStream -SizeToRead ([convert]::toint64(($Domain.MaxLength).trim(),16)) -PathToDMP $PathToDMP).Data
+            }
+        catch
+            {
+            $Domain.Data = ""
+            }
+	    
         $unkFunction = New-Object -Type psobject -Property (@{
                 "Location" = $fileReader.BaseStream.Position
                 "value" = Convert-LitEdian -String ([System.BitConverter]::ToString($fileReader.ReadBytes(8))).replace('-','')
@@ -3896,8 +3902,14 @@ $Start = Get-Date
         $Domain.MaxLength = Convert-LitEdian -String ([System.BitConverter]::ToString($fileReader.ReadBytes(2))).replace('-','')
         $fileReader.BaseStream.Position=($fileReader.BaseStream.Position+(Get-Align -Position $fileReader.BaseStream.Position -Architecture $Dump.SystemInfoStream.ProcessorArchitecture -Dump $Dump)) # | Out-Null
         $Domain.Buffer = Convert-LitEdian -String ([System.BitConverter]::ToString($fileReader.ReadBytes(8))).replace('-','')
-        $Domain.Data =  Get-CharsFromHex -HexString (Get-MemoryAddress -MemoryAddress $Domain.Buffer -MemoryRanges64 $Dump.Memory64ListStream -SizeToRead ([convert]::toint64(($Domain.MaxLength).trim(),16)) -PathToDMP $PathToDMP).Data
-        
+        try {
+            $Domain.Data =  Get-CharsFromHex -HexString (Get-MemoryAddress -MemoryAddress $Domain.Buffer -MemoryRanges64 $Dump.Memory64ListStream -SizeToRead ([convert]::toint64(($Domain.MaxLength).trim(),16)) -PathToDMP $PathToDMP).Data
+            }
+        catch
+            {
+            $Domain.Data = ""
+            }
+	    
         $unk0 = New-Object -Type psobject -Property (@{
                 "Location" = $fileReader.BaseStream.Position
                 "value" = Convert-LitEdian -String ([System.BitConverter]::ToString($fileReader.ReadBytes(8))).replace('-','')
@@ -4210,8 +4222,14 @@ $Start = Get-Date
         $Domain.MaxLength = Convert-LitEdian -String ([System.BitConverter]::ToString($fileReader.ReadBytes(2))).replace('-','')
         $fileReader.BaseStream.Position=($fileReader.BaseStream.Position+(Get-Align -Position $fileReader.BaseStream.Position -Architecture $Dump.SystemInfoStream.ProcessorArchitecture -Dump $Dump)) # | Out-Null
         $Domain.Buffer = Convert-LitEdian -String ([System.BitConverter]::ToString($fileReader.ReadBytes(8))).replace('-','')
-        $Domain.Data =  Get-CharsFromHex -HexString (Get-MemoryAddress -MemoryAddress $Domain.Buffer -MemoryRanges64 $Dump.Memory64ListStream -SizeToRead ([convert]::toint64(($Domain.MaxLength).trim(),16)) -PathToDMP $PathToDMP).Data
-
+        try {
+            $Domain.Data =  Get-CharsFromHex -HexString (Get-MemoryAddress -MemoryAddress $Domain.Buffer -MemoryRanges64 $Dump.Memory64ListStream -SizeToRead ([convert]::toint64(($Domain.MaxLength).trim(),16)) -PathToDMP $PathToDMP).Data
+            }
+        catch
+            {
+            $Domain.Data = ""
+            }
+	    
         $Password.Position = $fileReader.BaseStream.Position
         $Password.Length = Convert-LitEdian -String ([System.BitConverter]::ToString($fileReader.ReadBytes(2))).replace('-','')
         $Password.MaxLength = Convert-LitEdian -String ([System.BitConverter]::ToString($fileReader.ReadBytes(2))).replace('-','')
